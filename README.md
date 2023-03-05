@@ -18,7 +18,8 @@ Which of the following are rules for QBL question formatting?
 * Tags are placed on on one or more lines, and each tag beginning with a '#'
 * Config settings can be intermixed with tags and begin with a ':'
 * Regular answer options each begin with a * or a [*] if it is a correct answer.
-* Answers can begin with a > or a [>] if their order should NOT be shuffled.
+* Answers that begin with an extra `>` (e.g., `*>` or `[*>]`) will NOT be shuffled.
+* Answers that begin with an extra `+` (e.g., `*+` or `[*>+]`) will always be included.
 * Comments must be on their own line and begin with a `%` sign.
 * Code-style can be indicated by `backticks` or by
     a line beginning with at least four spaces
@@ -36,16 +37,22 @@ Specifically, the following line formats are available:
 
 | First Characters | Meaning |
 | ---------------- | ------- |
-| Alphanumeric     | Regular line of text, either question or continuation of answer. |
+| Alphanumeric     | Regular line of text; either a question or the continuation of answer. |
 | `*`              | Regular incorrect answer option. |
 | `[*]`            | Regular correct answer option. |
-| `>`              | Incorrect answer option that should not be shuffled. |
-| `[>]`            | Correct answer option that should not be shuffled. |
+| `*>` (or `[*>]`, etc.) | Answer options with `>` should not be shuffled. |
+| `*+` (or `*+>`, etc.)  | Answer options with `+` should always be included. |
 | `#`              | Tag, for identifying groups of questions collectively. |
 | `:`              | Configuration option. |
 | `%-`             | Beginning of next question (followed by comment) |
 | `% `             | Regular comment. |
 | four spaces      | Pre-formatted code block. |
+| `!`              | Alternate question option that negates all answer correctness. |
+| `+`              | Begin questions with `+` for them to always be selected for exams. |
+| `>`              | Begin questions with `>` for them to keep position relative to other Qs. |
+| `?`              | Explanation about the previous line's Q or A (for post-exam learning) |
+| `{` ... `}`      | Mathematical equations for question setup. |
+| `|@^&~;<,./()`   | Not yet used. |
 
 Certain characters also have special meanings in the middle of a line.
 These will all begin with either a back tick (`` ` ``) if we are changing mode or
