@@ -1,6 +1,6 @@
 # QBL
 
-QBL (pronounced "Quibble") is a Question Bank Language; it manages a repository of mulitple
+QBL (pronounced "Quibble") is a Question Bank Language; it manages a repository of multiple
 choice questions that can be used to generate exams in a desired format.
 
 ## Running QBL
@@ -11,7 +11,7 @@ from.
 ## Question format
 
 ```
-Which of the following are rules for QBL question fomatting?
+Which of the following are rules for QBL question formatting?
 #example-tag #second-tag
 :options:5   % Pick only 5 answers when placed on exam, including correct one.
 * The first character(s) on a line determine the context of that line.
@@ -43,17 +43,17 @@ Specifically, the following line formats are available:
 | `[>]`            | Correct answer option that should not be shuffled. |
 | `#`              | Tag, for identifying groups of questions collectively. |
 | `:`              | Configuration option. |
-| `%-`             | Beginning of next question (folllowed by comment) |
+| `%-`             | Beginning of next question (followed by comment) |
 | `% `             | Regular comment. |
 | four spaces      | Pre-formatted code block. |
 
 Certain characters also have special meanings in the middle of a line.
-These will all begin with either a back tick (`\``) if we are changing mode or
-formatting, or a backslash (`\\`) if we are inserting a special character.
-Anything that does not follow either of those two characters will be translatted
+These will all begin with either a back tick (`` ` ``) if we are changing mode or
+formatting, or a backslash (`` \ ``) if we are inserting a special character.
+Anything that does not follow either of those two characters will be translated
 directly.
 
-Examples of specail formatting:
+Examples of special formatting:
 
 ```
   `*Bold!`*
@@ -67,7 +67,7 @@ Examples of specail formatting:
 
 ## Output formats
 
-When running QBL questions can be loaded, manipulated, and resaved into a format of the users
+When running QBL questions can be loaded, manipulated, and re-saved into a format of the users
 choice.  By default questions are saved in QBL format (described above), but alternative
 formats are typically more useful for providing to students.
 
