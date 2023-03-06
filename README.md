@@ -6,7 +6,24 @@ choice questions that can be used to generate exams in a desired format.
 ## Running QBL
 
 When executing QBL from the command line, you can provide any number of filenames to load
-from.  
+from.  If a number is provided, it indicates the number of questions to generate for the
+exam.
+
+The following flags are also available:
+
+| Flag                 | Meaning                                                       |
+| -------------------- | ------------------------------------------------------------- |
+| `-d` or `--d2l`      | Output should be in D2L / Brightspace csv quiz upload format. |
+| `-h` or `--help`     | Provide additional information for using QBL and stop.        |
+| `-i` or `--interact` | Output should be interactive on the command line.             |
+| `-l` or `--latex`    | Output should be in Latex format.                             |
+| `-o` or `--output`   | Next arg will be the name to use for the output file.         |
+| `-q` or `--qbl`      | Output should be in QBL format.                               |
+| `-s` or `--set`      | Run the following argument to set a value; e.g. `var=12`.     |
+| `-t` or `--tag`      | Select only those questions with the provided tag.            |
+| `-v` or `--version`  | Print out the current version of the software and stop.       |
+| `-w` or `--web`      | Output should be in HTML format.                              |
+| `-x` or `--exclude`  | Remove all questions with the provided tag; overrides `-t`.   |
 
 ## Question format
 
@@ -28,7 +45,7 @@ Which of the following are rules for QBL question formatting?
 [>] All of the above.
 
 %---- Question break! --- 
-T/F: A line beginning with `%-` signals a new question, but is otherwise a comment:
+T/F: A skipped (blank) line signals the start of a new question:
 [*] True
 * False
 ```
@@ -37,22 +54,26 @@ Specifically, the following line formats are available:
 
 | First Characters | Meaning |
 | ---------------- | ------- |
-| Alphanumeric     | Regular line of text; either a question or the continuation of answer. |
-| `*`              | Regular incorrect answer option. |
-| `[*]`            | Regular correct answer option. |
-| `*>` (or `[*>]`, etc.) | Answer options with `>` should not be shuffled. |
-| `*+` (or `*+>`, etc.)  | Answer options with `+` should always be included. |
-| `#`              | Tag, for identifying groups of questions collectively. |
-| `:`              | Configuration option. |
-| `%-`             | Beginning of next question (followed by comment) |
-| `% `             | Regular comment. |
+| letters, numbers, `_` or `(` | Regular line of text; either a question or continuation of answer. |
+| `*`              | Incorrect answer option. |
+| `[*]`            | Correct answer option. |
+| `#`              | Tag to identify groups of questions collectively. |
+| `^`              | Tag to indicate that only ONE question from a group should be used. |
+| `:`              | Tag to set configuration option. |
+| `% `             | Comment line. |
 | four spaces      | Pre-formatted code block. |
-| `!`              | Alternate question option that negates all answer correctness. |
-| `+`              | Begin questions with `+` for them to always be selected for exams. |
-| `>`              | Begin questions with `>` for them to keep position relative to other Qs. |
+| `-`              | Remove `-` and ignore other start format; use for blank lines in question.|
+| `+`              | Question should always be selected. |
+| `>`              | Question should be kept in the same position relative to other Qs. |
+| `!`              | Question is alternate option that negates all answer correctness. |
 | `?`              | Explanation about the previous line's Q or A (for post-exam learning) |
 | `{` ... `}`      | Mathematical equations for question setup. |
-| `|@^&~;<,./()`   | Not yet used. |
+| `=|@&~;<,./`   | Not yet used. |
+
+The `*` or `[*]` at the beginning of the line can also have the `*` followed by
+`>` to indicate that the answer option should not be shuffled, and/or by `+` to
+indicate that this option should always be included in random sampling.
+For example, `*>`, `[*>]`, `*+` or `[*+>]` are all legal option beginnings.
 
 Certain characters also have special meanings in the middle of a line.
 These will all begin with either a back tick (`` ` ``) if we are changing mode or
@@ -84,7 +105,7 @@ Formats include:
 | ------ | --------- | ------------- |
 | D2L / Brightspace csv quiz upload | .csv |  `-d` or `--d2l` |
 | HTML (planned | .html |  `-h` or `--html |
-| Latex (planned | .tex |  `-l` or `--late |
+| Latex (planned | .tex |  `-l` or `--latex` |
 | QBL | .qbl |  `-q` or `--qbl` |
 
 
