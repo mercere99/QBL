@@ -3,7 +3,7 @@
 #include "../Empirical/include/emp/tools/String.hpp"
 
 // Convert a single line of text to D2L format.
-emp::String LineToD2L(emp::String line) {
+static inline emp::String LineToD2L(emp::String line) {
   emp::String out_line;
 
   bool in_codeblock = line.HasPrefix("    ");
@@ -47,7 +47,7 @@ emp::String LineToD2L(emp::String line) {
 }
 
 // Convert a whole text block to D2L format.
-emp::String TextToD2L(const emp::String & text) {
+static inline emp::String TextToD2L(const emp::String & text) {
   emp::vector<emp::String> lines = text.Slice("\n");
   for (auto & line : lines) line = LineToD2L(line);
   return emp::Join(lines, "<br>");
