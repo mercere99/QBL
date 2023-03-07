@@ -14,6 +14,7 @@ The following flags are also available:
 | Flag                 | Meaning                                                       |
 | -------------------- | ------------------------------------------------------------- |
 | `-d` or `--d2l`      | Output should be in D2L / Brightspace csv quiz upload format. |
+| `-g` or `--generate` | Specify the number of questions to randomly generate.         |
 | `-h` or `--help`     | Provide additional information for using QBL and stop.        |
 | `-i` or `--interact` | Output should be interactive on the command line.             |
 | `-l` or `--latex`    | Output should be in Latex format.                             |
@@ -62,18 +63,23 @@ Specifically, the following line formats are available:
 | `:`              | Tag to set configuration option. |
 | `% `             | Comment line. |
 | four spaces      | Pre-formatted code block. |
-| `-`              | Remove `-` and ignore other start format; use for blank lines in question.|
+| `-`              | Remove `-` and ignore other start format; use for blank lines in questions.|
 | `+`              | Question should always be selected. |
 | `>`              | Question should be kept in the same position relative to other Qs. |
 | `!`              | Question is alternate option that negates all answer correctness. |
 | `?`              | Explanation about the previous line's Q or A (for post-exam learning) |
 | `{` ... `}`      | Mathematical equations for question setup. |
-| `=|@&~;<,./`   | Not yet used. |
+| `=\|@&~;<,./`     | Not yet used. |
 
 The `*` or `[*]` at the beginning of the line can also have the `*` followed by
 `>` to indicate that the answer option should not be shuffled, and/or by `+` to
 indicate that this option should always be included in random sampling.
 For example, `*>`, `[*>]`, `*+` or `[*+>]` are all legal option beginnings.
+
+If any tags (e.g., keywords beginning with `#`, `^`, or `:` above) are created
+outside of a question definition, they will apply to ALL questions that follow,
+until the end of the current file OR until they are replaced by a new tag
+block.  A `#` by itself on a line will remove the current tag block.
 
 Certain characters also have special meanings in the middle of a line.
 These will all begin with either a back tick (`` ` ``) if we are changing mode or
