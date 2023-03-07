@@ -1,4 +1,12 @@
+#pragma once
+
+#include "../Empirical/include/emp/base/notify.hpp"
+#include "../Empirical/include/emp/base/vector.hpp"
+#include "../Empirical/include/emp/tools/String.hpp"
+
 #include "Question.hpp"
+
+using emp::String;
 
 class QuestionBank {
 private:
@@ -41,5 +49,9 @@ public:
     for (size_t id = 0; id < questions.size(); ++id) {
       questions[id].PrintD2L(os);
     }
+  }
+
+  void PrintDebug(std::ostream & os=std::cout) const {
+    os << "Question Bank\n";
   }
 };
