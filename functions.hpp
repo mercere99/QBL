@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../Empirical/include/emp/base/notify.hpp"
 #include "../Empirical/include/emp/base/vector.hpp"
 #include "../Empirical/include/emp/tools/String.hpp"

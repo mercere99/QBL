@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 
 #include "../Empirical/include/emp/base/notify.hpp"
