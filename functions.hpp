@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../Empirical/include/emp/base/notify.hpp"
-#include "../Empirical/include/emp/base/vector.hpp"
-#include "../Empirical/include/emp/tools/String.hpp"
+#include "emp/base/notify.hpp"
+#include "emp/base/vector.hpp"
+#include "emp/tools/String.hpp"
 
 // Convert a single line of text to D2L format.
 static inline emp::String LineToD2L(emp::String line) {

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../Empirical/include/emp/base/notify.hpp"
-#include "../Empirical/include/emp/base/vector.hpp"
-#include "../Empirical/include/emp/tools/String.hpp"
+#include "emp/base/notify.hpp"
+#include "emp/base/vector.hpp"
+#include "emp/tools/String.hpp"
 
 #include "Question.hpp"
 
@@ -67,6 +67,9 @@ public:
   }
 
   void PrintDebug(std::ostream & os=std::cout) const {
-    os << "Question Bank\n";
+    os << "Question Bank\n"
+       << "  num questions: " << questions.size() << "\n"
+       << "  source files:  " << MakeLiteral(source_files) << "\n"
+       << std::endl;
   }
 };

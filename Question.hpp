@@ -2,12 +2,14 @@
 
 #include <iostream>
 
-#include "../Empirical/include/emp/base/notify.hpp"
-#include "../Empirical/include/emp/base/vector.hpp"
-#include "../Empirical/include/emp/io/File.hpp"
-#include "../Empirical/include/emp/tools/String.hpp"
+#include "emp/base/notify.hpp"
+#include "emp/base/vector.hpp"
+#include "emp/io/File.hpp"
+#include "emp/tools/String.hpp"
 
 #include "functions.hpp"
+
+using emp::String;
 
 class Question {
 private:
