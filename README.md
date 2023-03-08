@@ -31,10 +31,10 @@ The following flags are also available:
 ```
 Which of the following are rules for QBL question formatting?
 #example-tag #second-tag
-:options:5   % Pick only 5 answers when placed on exam, including correct one.
+:options=5   % Pick only 5 answers when placed on exam, including correct one.
 * The first character(s) on a line determine the context of that line.
 * Tags are placed on on one or more lines, and each tag beginning with a '#'
-* Config settings can be intermixed with tags and begin with a ':'
+* Config tags can be intermixed with other tags and begin with a ':'
 * Regular answer options each begin with a * or a [*] if it is a correct answer.
 * Answers that begin with an extra `>` (e.g., `*>` or `[*>]`) will NOT be shuffled.
 * Answers that begin with an extra `+` (e.g., `*+` or `[*>+]`) will always be included.
@@ -60,7 +60,7 @@ Specifically, the following line formats are available:
 | `[*]`            | Correct answer option. |
 | `#`              | Tag to identify groups of questions collectively. |
 | `^`              | Tag to indicate that only ONE question from a group should be used. |
-| `:`              | Tag to set configuration option. |
+| `:`              | Tag to set configuration option (must have an `=` to set value). |
 | `% `             | Comment line. |
 | four spaces      | Pre-formatted code block. |
 | `-`              | Remove `-` and ignore other start format; use for blank lines in questions.|
