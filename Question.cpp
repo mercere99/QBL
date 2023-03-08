@@ -1,13 +1,13 @@
 #include "Question.hpp"
 
 void Question::Print(std::ostream & os) const {
-  os << "QUESTION " << id << "\n" << question << "\n";
+  os << "%- QUESTION " << id << "\n" << question << "\n";
   for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
-    os << "  Option " << (opt_id+1) << ": " << options[opt_id];
-    if (opt_id == correct) os << " [CORRECT]";
-    os << std::endl;
+    if (opt_id == correct) os << "[*] ";
+    else os << "* ";
+    os << options[opt_id] << '\n';
   }
-  os << "--------------" << std::endl;
+  os << std::endl;
 }
 
 void Question::PrintD2L(std::ostream & os) const {
