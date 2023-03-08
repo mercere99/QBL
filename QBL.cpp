@@ -25,15 +25,19 @@ private:
     LATEX
   };
 
-  Format format = Format::NONE; // No format set yet.
-  String out_filename = "";         // Output filename; empty = no file; "_interact_" for interactive
+  Format format = Format::NONE;        // No format set yet.
+  String out_filename = "";            // Output filename; empty = no file; "_interact_" for interactive
   emp::vector<String> include_tags;
   emp::vector<String> exclude_tags;
   emp::vector<String> question_files;
+  size_t generate_count = 0;           // How many questions should be generated?
+
 public:
   QBL(int argc, char * argv[]) : flags(argc, argv) {
     flags.AddOption('d', "--d2l",     [this](){FormatD2L();},
       "Set output to be D2L / Brightspace csv quiz upload format.");
+    flags.AddOption('g', "--generate",[this](String arg){SetGenerate(arg);},
+      "Randomly generate questions (number as arg).");
     flags.AddOption('h', "--help",    [this](){PrintHelp();},
       "Provide usage information for QBL.");
     flags.AddOption('i', "--interact",[this](){SetOutput("_interact_");},
@@ -72,6 +76,13 @@ public:
     out_filename = _filename;
   }
 
+  void SetGenerate(String _count) {
+    if (generate_count != 0) {
+      emp::notify::Error("Can only set one value for number of questions to generate.");
+    }
+    generate_count = _count.As<size_t>();
+  }
+
   void PrintVersion() const {
     std::cout << "QBL (Question Bank Language) version " QBL_VERSION << std::endl;
   }
@@ -94,6 +105,19 @@ public:
     return "Unknown!";
   }
 
+  void LoadFiles() {
+    for (auto filename : question_files) {
+      qbank.NewFile(filename);   // Let the question bank know we are loading from a new file.
+      emp::File file(filename);
+      file.RemoveIfBegins("%");  // Remove all comment lines.
+
+      for (const emp::String & line : file) {
+        if (line.OnlyWhitespace()) { qbank.NewEntry(); continue; }
+        qbank.AddLine(line);
+      }
+    }
+  }
+
   void PrintDebug() const {
     qbank.PrintDebug();
     std::cout << "Question Files: " << emp::MakeLiteral(question_files) << "\n";
@@ -107,21 +131,9 @@ public:
 int main(int argc, char * argv[])
 {
   QBL qbl(argc, argv);
+  qbl.LoadFiles();
   qbl.PrintDebug();
 
-  // if (argc !=2) {
-  //   std::cout << "Format: " << argv[0] << " [input_file]" << std::endl;
-  //   exit(1);
-  // }
-
-  // emp::File file(argv[1]);
-  // file.RemoveIfBegins("%");  // Remove all comment lines.
-
-  // bool start_new = true;
-  // for (const emp::String & line : file) {
-  //   if (line.OnlyWhitespace()) { qbank.NewEntry(); continue; }
-  //   qbank.AddLine(line);
-  // }
 
   // qbank.Print();
 
