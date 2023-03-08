@@ -11,6 +11,7 @@ using emp::String;
 class QuestionBank {
 private:
   emp::vector<Question> questions;
+  emp::vector<String> source_files;
   bool start_new = true;            // Should next text start a new question?
 
   Question & CurQ() {
@@ -26,17 +27,31 @@ public:
 
   void NewEntry() { start_new = true; }
 
-  void AddLine(String line) {
-    // Test if line is a question option
-    if (line[0] == '*' || line[0] == '[') {
-      emp::String tag = line.PopWord();
-      CurQ().AddOption(tag, line);
-    }
+  void NewFile(String filename) { source_files.push_back(filename), start_new = true; }
 
-    // Otherwise it must be part of the question itself.
-    else {
+  void AddLine(String line) {
+    emp::String tag;
+
+    // The first character on a line determines what that line is.
+    switch (line[0]) {
+    case '*':                         // Question option (incorrect)
+    case '[':                         // Question option (correct)
+      tag = line.PopWord();
+      CurQ().AddOption(tag, line);
+      break;
+    case '#':                         // Regular question tag
+    case '^':                         // "Exclusive" question tag
+    case ':':                         // Option tag
+      CurQ().AddTags(line);
+      break;
+    case '-':                         // Override other start characters and add the rest.
+      line.erase(line.begin());
+      CurQ().AddText(line);
+      break;
+    default:                          // Otherwise it must be part of the question itself.
       CurQ().AddText(line);
     }
+
   }
 
   void Print(std::ostream & os=std::cout) const {
