@@ -48,6 +48,9 @@ public:
     case ':':                         // Option tag
       CurQ().AddTags(line);
       break;
+    case '!':                         // Alternative question option (negated)
+      CurQ().AddAltQuestion(line);
+      break;
     case '-':                         // Override other start characters and add the rest.
       line.erase(line.begin());
       CurQ().AddText(line);
@@ -57,17 +60,25 @@ public:
     }
   }
 
-  void Generate(size_t count) {
+  void Validate() {
+    for (auto & q : questions) q.Validate();
+  }
+
+  void Generate(size_t count, emp::Random & random) {
     emp::notify::TestError(count > questions.size(), "Requesting more questions (", count,
       ") than available in Question Bank (", questions.size(), ")");
 
     /// @todo take into account fixes positions, required inclusions & exclusive-or choices.
 
-    emp::Random random;
     emp::Shuffle(random, questions, count);
     questions.resize(count);
 
-    for (auto & q : questions) q.Generate();
+    for (auto & q : questions) q.Generate(random);
+  }
+
+  void Generate(size_t count) {
+    emp::Random random;
+    Generate(count, random);
   }
 
   void Print(std::ostream & os=std::cout) const {
