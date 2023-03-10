@@ -31,7 +31,7 @@ private:
   emp::vector<String> include_tags;
   emp::vector<String> exclude_tags;
   emp::vector<String> question_files;
-  size_t generate_count = 0;           // How many questions should be generated?
+  size_t generate_count = 0;           // How many questions should be generated? (0 = use all)
 
 public:
   QBL(int argc, char * argv[]) : flags(argc, argv) {
@@ -125,6 +125,11 @@ public:
     }
   }
 
+  void Generate() {
+    qbank.Validate();
+    if (generate_count) qbank.Generate(generate_count);
+  }
+
   void Print(std::ostream & os, Format out_format) const {
     if (out_format == Format::QBL || out_format == Format::NONE) qbank.Print(os);
     else if (out_format == Format::D2L) qbank.PrintD2L(os);
@@ -164,9 +169,6 @@ int main(int argc, char * argv[])
 {
   QBL qbl(argc, argv);
   qbl.LoadFiles();
+  qbl.Generate();
   qbl.Print();
-
-
-  // qbank.Print();
-
 }
