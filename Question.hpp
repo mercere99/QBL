@@ -22,6 +22,14 @@ private:
     bool is_correct;   ///< Is this option marked as a correct answer?
     bool is_fixed;     ///< Is this option in a fixed position?
     bool is_required;  ///< Does this option have to be included?
+
+    String GetQBLBullet() const {
+      String out("*");
+      if (is_required) out += '+';
+      if (is_fixed) out += '>';
+      if (is_correct) out.Set('[', out, ']');
+      return out;
+    }
   };
 
   emp::String question;                  ///< Main wording for this questions.

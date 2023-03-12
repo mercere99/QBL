@@ -7,9 +7,7 @@ using emp::MakeCount;
 void Question::Print(std::ostream & os) const {
   os << "%- QUESTION " << id << "\n" << question << "\n";
   for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
-    if (options[opt_id].is_correct) os << "[*] ";
-    else os << "* ";
-    os << options[opt_id].text << '\n';
+    os << options[opt_id].GetQBLBullet() << " " << options[opt_id].text << '\n';
   }
   os << std::endl;
 }
@@ -91,6 +89,16 @@ void Question::ReduceOptions(emp::Random & random, size_t correct_target, size_t
   // Pick the set of options to use.
   emp::BitVector used(options.size());
   size_t correct_picks = 0, incorrect_picks = 0;
+
+  // Start with required options.
+  for (size_t i = 0; i < options.size(); ++i) {
+    if (options[i].is_required) {
+      used[i].Set();
+      (options[i].is_correct ? correct_picks : incorrect_picks)++;      
+    }
+  }
+
+  // Randomly choose remaining options.
   while (correct_picks < correct_target || incorrect_picks < incorrect_target) {
     size_t pick = random.GetUInt64(options.size());
     if (used[pick]) continue;
