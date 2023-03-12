@@ -28,8 +28,9 @@ private:
 
   Format format = Format::NONE;        // No format set yet.
   String out_filename = "";            // Output filename; empty = no file; "_interact_" for interactive
-  emp::vector<String> include_tags;
-  emp::vector<String> exclude_tags;
+  emp::vector<String> include_tags;    // Questions with tags should all be included.
+  emp::vector<String> exclude_tags;    // Questions with these tags should all be excluded.
+  emp::vector<String> require_tags;    // Only questions with these tags should be included.
   emp::vector<String> question_files;
   size_t generate_count = 0;           // How many questions should be generated? (0 = use all)
 
@@ -37,7 +38,7 @@ public:
   QBL(int argc, char * argv[]) : flags(argc, argv) {
     flags.AddOption('d', "--d2l",     [this](){ SetFormat(Format::D2L); },
       "Set output to be D2L / Brightspace csv quiz upload format.");
-    flags.AddOption('D', "--debug",   [this](){  SetFormat(Format::DEBUG); },
+    flags.AddOption('D', "--debug",   [this](){ SetFormat(Format::DEBUG); },
       "Print extra debug information.");
     flags.AddOption('g', "--generate",[this](String arg){ SetGenerate(arg); },
       "Randomly generate questions (number as arg).");
@@ -50,6 +51,8 @@ public:
     flags.AddOption('o', "--output",  [this](String arg){ SetOutput(arg); },
       "Set output file name [arg].");
     flags.AddOption('q', "--qbl",     [this](){ SetFormat(Format::QBL); },
+      "Set output to be QBL format.");
+    flags.AddOption('r', "--require", [this](String arg){require_tags.push_back(arg);},
       "Set output to be QBL format.");
 //    flags.AddOption('s', "--set",     [this](){},
 //      "Run the following argument to set a value; e.g. `var=12`.");
@@ -127,7 +130,7 @@ public:
 
   void Generate() {
     qbank.Validate();
-    if (generate_count) qbank.Generate(generate_count);
+    if (generate_count) qbank.Generate(generate_count, include_tags, exclude_tags, require_tags);
   }
 
   void Print(std::ostream & os, Format out_format) const {
@@ -160,6 +163,7 @@ public:
       << "Output Format: " << GetFormatName(format) << "\n"
       << "Include tags: " << emp::MakeLiteral(include_tags) << "\n"
       << "Exclude tags: " << emp::MakeLiteral(exclude_tags) << "\n"
+      << "Required tags: " << emp::MakeLiteral(require_tags) << "\n"
       << "----------\n";
     qbank.PrintDebug(os);
   }
