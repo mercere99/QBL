@@ -5,6 +5,7 @@
 #include "emp/base/notify.hpp"
 #include "emp/base/vector.hpp"
 #include "emp/datastructs/map_utils.hpp"
+#include "emp/datastructs/vector_utils.hpp"
 #include "emp/io/File.hpp"
 #include "emp/math/Random.hpp"
 #include "emp/math/random_utils.hpp"
@@ -40,6 +41,9 @@ private:
   emp::vector<String> base_tags;
   emp::vector<String> exclusive_tags;
   std::map<String,String> config_tags;
+
+  bool is_required = false;
+  bool is_fixed = false;
 
   // Internal tracking
   emp::Range<size_t> correct_range;
@@ -91,6 +95,12 @@ public:
   Question & operator=(const Question &) = default;
   Question & operator=(Question &&) = default;
 
+  bool IsFixed() const { return is_fixed; }
+  bool IsRequired() const { return is_required; }
+
+  void SetFixed() { is_fixed = true; }
+  void SetRequired() { is_required = true; }
+
   size_t CountCorrect() const { return Count([](const Option & o){ return o.is_correct; }); }
   size_t CountIncorrect() const { return Count([](const Option & o){ return !o.is_correct; }); }
   size_t CountRequired() const { return Count([](const Option & o){ return o.is_required; }); }
@@ -104,6 +114,8 @@ public:
     switch (last_edit) {
     case Section::NONE:
       question = line;
+      if (question.size() && question[0] == '+') { is_required = true; question.erase(0,1); }
+      if (question.size() && question[0] == '>') { is_fixed = true;    question.erase(0,1); }
       last_edit = Section::QUESTION;
       break;
     case Section::QUESTION:
@@ -149,6 +161,14 @@ public:
       }
     }
   }
+
+  const emp::vector<String> & GetBaseTags() const { return base_tags; }
+  const emp::vector<String> & GetExclusiveTags() const { return exclusive_tags; }
+
+  bool HasTag(String tag) const {
+    return emp::Has(base_tags, tag) || emp::Has(exclusive_tags, tag) || emp::Has(config_tags, tag);
+  }
+
   void Print(std::ostream & os=std::cout) const;
   void PrintD2L(std::ostream & os=std::cout) const;
   void PrintHTML(std::ostream & os=std::cout) const;
