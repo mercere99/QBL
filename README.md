@@ -5,6 +5,11 @@ choice questions that can be used to generate exams in a desired format.
 
 ## Running QBL
 
+Format:
+```bash
+./QBL [-dhilqvw] [-g question_count] [-rtx require/include/exclude_tags] [-o outfile] [question_file ...]
+```
+
 When executing QBL from the command line, you can provide any number of filenames to load
 from.  If a number is provided, it indicates the number of questions to generate for the
 exam.
@@ -21,7 +26,7 @@ The following flags are also available:
 | `-o` or `--output`   | Next arg will be the name to use for the output file.         |
 | `-q` or `--qbl`      | Output should be in QBL format.                               |
 | `-r` or `--require`  | Require questions to have this tag for them to be included.   |
-| `-s` or `--set`      | Run the following argument to set a value; e.g. `var=12`.     |
+| `-s` or `--set`      | (TO IMPLEMENT) Run the following argument to set a value; e.g. `var=12`. |
 | `-t` or `--tag`      | All questions with the provided tag must be included.         |
 | `-v` or `--version`  | Print out the current version of the software and stop.       |
 | `-w` or `--web`      | Output should be in HTML format.                              |
