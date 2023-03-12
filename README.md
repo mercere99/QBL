@@ -22,14 +22,14 @@ The following flags are also available:
 | `-g` or `--generate` | Specify the number of questions to randomly generate.         |
 | `-h` or `--help`     | Provide additional information for using QBL and stop.        |
 | `-i` or `--interact` | Output should be interactive on the command line.             |
-| `-l` or `--latex`    | Output should be in Latex format.                             |
+| `-l` or `--latex`    | (TO IMPLEMENT) Output should be in Latex format.                             |
 | `-o` or `--output`   | Next arg will be the name to use for the output file.         |
 | `-q` or `--qbl`      | Output should be in QBL format.                               |
 | `-r` or `--require`  | Require questions to have this tag for them to be included.   |
 | `-s` or `--set`      | (TO IMPLEMENT) Run the following argument to set a value; e.g. `var=12`. |
 | `-t` or `--tag`      | All questions with the provided tag must be included.         |
 | `-v` or `--version`  | Print out the current version of the software and stop.       |
-| `-w` or `--web`      | Output should be in HTML format.                              |
+| `-w` or `--web`      | (TO IMPLEMENT) Output should be in HTML format.                              |
 | `-x` or `--exclude`  | Remove all questions with the provided tag; overrides `-t`.   |
 
 ## Question format
