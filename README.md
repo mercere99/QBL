@@ -53,23 +53,23 @@ T/F: A skipped (blank) line signals the start of a new question:
 
 Specifically, the following line formats are available:
 
-| First Characters | Meaning |
-| ---------------- | ------- |
+| First Characters   | Meaning                                                                      |
+| ------------------ | ---------------------------------------------------------------------------- |
 | letters, numbers, `_` or `(` | Regular line of text; either a question or continuation of answer. |
-| `*`                | Incorrect answer option. |
-| `[*]`              | Correct answer option. |
-| `#`                | Tag to identify groups of questions collectively. |
-| `^`                | Tag to indicate that only ONE question from a group should be used. |
-| `:`                | Tag to set configuration option (must have an `=` to set value). |
-| `% `               | Comment line. |
-| four spaces        | Pre-formatted code block. |
-| `-`                | Remove `-` and ignore other start format; use for blank lines in questions.|
-| `+` (TO IMPLEMENT) | Question should always be selected. |
-| `>` (TO IMPLEMENT) | Question should be kept in the same position relative to other Qs. |
-| `!` (TO IMPLEMENT) | Question is alternate option that negates all answer correctness.  |
-| `?` (TO IMPLEMENT) | Explanation about the previous line's Q or A (for post-exam learning) |
-| `{` ... `}` (TO IMPLEMENT) | Mathematical equations for question setup. |
-| `=\|@&~;<,./`      | Not yet specified. |
+| `*`                | Incorrect answer option.                                                     |
+| `[*]`              | Correct answer option.                                                       |
+| `#`                | Tag to identify groups of questions collectively.                            |
+| `^`                | Tag to indicate that only ONE question from a group should be used.          |
+| `:`                | Tag to set configuration option (must have an `=` to set value).             |
+| `% `               | Comment line.                                                                |
+| four spaces        | Pre-formatted code block.                                                    |
+| `-`                | Remove `-` and ignore other start format; allows blank lines in questions.   |
+| `+` (TO IMPLEMENT) | Question should always be selected.                                          |
+| `>` (TO IMPLEMENT) | Question should be kept in the same position relative to other Qs.           |
+| `!` (TO IMPLEMENT) | Question is alternate option that negates all answer correctness.            |
+| `?` (TO IMPLEMENT) | Explanation about the previous line's Q or A (for post-exam learning)        |
+| `{` ... `}` (TO IMPLEMENT) | Mathematical equations for question setup.                           |
+| `=\|@&~;<,./`      | Not yet specified.                                                           |
 
 The `*` or `[*]` at the beginning of the line can also have the `*` followed by
 `>` to indicate that the answer option should not be shuffled, and/or by `+` to
@@ -107,15 +107,15 @@ formats are typically more useful for providing to students.
 
 Formats include:
 
-| Format | Extension | Override flag |
-| ------ | --------- | ------------- |
-| D2L / Brightspace csv quiz upload | .csv |  `-d` or `--d2l` |
-| HTML (planned | .html |  `-h` or `--html |
-| Latex (planned | .tex |  `-l` or `--latex` |
-| QBL | .qbl |  `-q` or `--qbl` |
+| Format                            | Extension | Override flag      |
+| --------------------------------- | --------- | ------------------ |
+| D2L / Brightspace csv quiz upload | .csv      |  `-d` or `--d2l`   |
+| HTML (planned)                    | .html     |  `-h` or `--html`  |
+| Latex (planned)                   | .tex      |  `-l` or `--latex` |
+| QBL                               | .qbl      |  `-q` or `--qbl`   |
 
 
-`-r` or `--run` - Run directly as interactive command line (planned)
+(Planned) `-i` or `--interact` - Run directly as interactive command line (planned)
 
 ## Question configuration tags
 
@@ -127,6 +127,6 @@ Available configuration tags are:
 
 | Config Tag  | Default | Meaning                                                                  |
 | ----------- | ------- | ------------------------------------------------------------------------ |
-| `:correct`  | 1       | Number of correct answers to include (can be range, e.g. `2-4`)          |
-| `:options`  | 3-10    | Number of answer options to include (e.g., `5` or range `3-4`).          |
+| `:correct`  | 1       | Number of correct answers to include as value (`1`) or range (`2-4`).    |
+| `:options`  | all     | Number of answer options to include (e.g., `5` or range `3-4`).          |
 | `:alt_prob` | 0.5     | Probability of choosing alternate question if one exists. (TO IMPLEMENT) |
