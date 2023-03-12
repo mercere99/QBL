@@ -70,7 +70,7 @@ Specifically, the following line formats are available:
 | `% `               | Comment line.                                                                |
 | four spaces        | Pre-formatted code block.                                                    |
 | `-`                | Remove `-` and ignore other start format; allows blank lines in questions.   |
-| `+` (TO IMPLEMENT) | Question should always be selected.                                          |
+| `+`                | Question should always be selected.                                          |
 | `>` (TO IMPLEMENT) | Question should be kept in the same position relative to other Qs.           |
 | `!` (TO IMPLEMENT) | Question is alternate option that negates all answer correctness.            |
 | `?` (TO IMPLEMENT) | Explanation about the previous line's Q or A (for post-exam learning)        |
