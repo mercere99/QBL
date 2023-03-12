@@ -41,7 +41,7 @@ void Question::PrintLatex(std::ostream & os) const {
 void Question::Validate() {
   // Collect config info for this question.
   correct_range = GetConfig(":correct", emp::Range<size_t>(1,1));
-  option_range = GetConfig(":options", emp::Range<size_t>(4,10));
+  option_range = GetConfig(":options", emp::Range<size_t>(options.size(),options.size()));
 
   // Are there enough correct answers?
   const size_t correct_count = CountCorrect();
