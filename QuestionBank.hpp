@@ -16,7 +16,16 @@ private:
   emp::vector<String> source_files;
   bool start_new = true;            // Should next text start a new question?
 
-  bool randomize = false;           // Should we randomize the answers?
+  bool randomize = true;            // Should we randomize the answer options?
+
+  enum class QStatus {
+    UNKNOWN = 0,
+    EXCLUDED,
+    INCLUDED
+  };
+  emp::vector<QStatus> q_status;
+  size_t include_count=0;           // Number of questions selected for inclusion.
+  size_t exclude_count=0;           // Number of questions excluded.
 
   Question & CurQ() {
     if (start_new) {
@@ -64,15 +73,79 @@ public:
     for (auto & q : questions) q.Validate();
   }
 
+  // Exclude the specified question.  Report any problems.
+  void Generate_ExcludeQuestion(size_t id, String reason) {
+    emp::notify::TestError(q_status[id] == QStatus::INCLUDED,
+      "Question ", id, " being excluded (", reason, "), but already included.");
+    if (q_status[id] == QStatus::UNKNOWN) {
+      q_status[id] = QStatus::EXCLUDED;
+      exclude_count++;
+    }
+  }
+
+  // Include the specified question.  Report any problems.
+  void Generate_IncludeQuestion(size_t id, String reason) {
+    emp::notify::TestError(q_status[id] == QStatus::EXCLUDED,
+      "Question ", id, " being included (", reason, "), but already excluded.");
+    if (q_status[id] == QStatus::INCLUDED) return; // Already included.
+
+    // If there are any exclusive tags, honor them.
+    const auto & exclude_tags = questions[id].GetExclusiveTags();
+    for (const auto & tag : exclude_tags) {
+      for (size_t i = 0; i < questions.size(); ++i) {
+        if (i == id) continue;
+        if (questions[i].HasTag(tag)) {
+          Generate_ExcludeQuestion(i, MakeString("Conflict with tag '", tag, "'"));
+        }
+      }
+    }
+
+    q_status[id] = QStatus::INCLUDED;
+    include_count++;
+  }
+
+  // Scan through all of the questions and included the ones we are required to.
+  void Generate_IncludeRequired() {
+    for (size_t i = 0; i < questions.size(); ++i) {
+      if (questions[i].IsRequired()) Generate_IncludeQuestion(i, "required");
+    }
+  }
+
+  // Remove all of the questions that we are not going to use.
+  void Generate_PurgeUnused() {
+    for (size_t i = questions.size()-1; i < questions.size(); --i) {
+      if (q_status[i] != QStatus::INCLUDED) questions.erase(questions.begin() + i);
+    }
+  }
+
   void Generate(size_t count, emp::Random & random) {
     emp::notify::TestError(count > questions.size(), "Requesting more questions (", count,
       ") than available in Question Bank (", questions.size(), ")");
 
-    /// @todo take into account fixes positions, required inclusions & exclusive-or choices.
+    // Setup analysis for picking questions.
+    q_status.resize(questions.size(), QStatus::UNKNOWN);
+    include_count = 0;
+    exclude_count = 0;
 
-    emp::Shuffle(random, questions, count);
-    questions.resize(count);
+    Generate_IncludeRequired();
 
+    // Pick them randomly from here; loop as long as we need questions and there are some left.
+    while (include_count < count && include_count + exclude_count < questions.size()) {
+      size_t pick = random.GetUInt(questions.size());
+      if (q_status[pick] != QStatus::UNKNOWN) continue;
+      Generate_IncludeQuestion(pick, "random pick");
+    }
+
+    emp::notify::TestWarning(include_count < count,
+      "Unable to select ", count, " questions given exclusions; only ", include_count, " used.");
+
+    Generate_PurgeUnused();
+
+    // Randomize the order of the questions.
+    /// @todo take into account fixed positions.
+    emp::Shuffle(random, questions);
+
+    // Go through each of the kept questions an limit the choices.
     for (auto & q : questions) q.Generate(random);
   }
 
