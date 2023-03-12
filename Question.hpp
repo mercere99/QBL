@@ -69,6 +69,11 @@ private:
     }
   }
 
+  template <typename FUN_T>
+  size_t Count(FUN_T fun) const {
+    return std::count_if(options.begin(), options.end(), fun);
+  }
+
 public:
   Question() { }
   Question(size_t _id) : id(_id) { }
@@ -78,20 +83,12 @@ public:
   Question & operator=(const Question &) = default;
   Question & operator=(Question &&) = default;
 
-  size_t CountCorrect() const {
-    return std::count_if(options.begin(), options.end(),
-                         [](const Option & o){ return o.is_correct; });
-  }
-
-  size_t CountRequired() const {
-    return std::count_if(options.begin(), options.end(),
-                         [](const Option & o){ return o.is_required; });
-  }
-
-  size_t CountRequiredCorrect() const {
-    return std::count_if(options.begin(), options.end(),
-                         [](const Option & o){ return o.is_required && o.is_correct; });
-  }
+  size_t CountCorrect() const { return Count([](const Option & o){ return o.is_correct; }); }
+  size_t CountIncorrect() const { return Count([](const Option & o){ return !o.is_correct; }); }
+  size_t CountRequired() const { return Count([](const Option & o){ return o.is_required; }); }
+  size_t CountRequiredCorrect() const
+    { return Count([](const Option & o){ return o.is_correct && o.is_required; }); }
+  size_t CountFixed() const { return Count([](const Option & o){ return o.is_fixed; }); }
 
   void AddText(const emp::String & line) {
     // Text with a start symbol would have been directed elsewhere.  Regular text is either a
@@ -150,5 +147,7 @@ public:
   void PrintLatex(std::ostream & os=std::cout) const;
 
   void Validate();
+  void ReduceOptions(emp::Random & random, size_t correct_target, size_t incorrect_target);
+  void ShuffleOptions(emp::Random & random);
   void Generate(emp::Random & random);
 };

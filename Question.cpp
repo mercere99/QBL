@@ -1,5 +1,6 @@
 #include "Question.hpp"
 #include "functions.hpp"
+#include "emp/math/random_utils.hpp"
 
 using emp::MakeCount;
 
@@ -73,11 +74,64 @@ void Question::Validate() {
     MakeCount(incorrect_count, "other option"), ", but requires at least ", option_range.Lower(),
     "options.");
   option_range.LimitUpper(max_options);     // Must at least select required options.
+
+  // Make sure that all fixed-order options are at the beginning or end.
+  size_t test_pos = 0;
+  while (test_pos < options.size() && options[test_pos].is_fixed) test_pos++;  // Front fixed.
+  while (test_pos < options.size() && !options[test_pos].is_fixed) test_pos++; // Middle NOT fixed.
+  while (test_pos < options.size() && options[test_pos].is_fixed) test_pos++;  // Back fixed.
+  emp::notify::TestError(test_pos < options.size(),
+    "Question ", id, " has fixed-position options in middle; fixed positions must be at start and end.");
+}
+
+void Question::ReduceOptions(emp::Random & random, size_t correct_target, size_t incorrect_target) {
+  emp_assert(correct_target <= CountCorrect());
+  emp_assert(incorrect_target <= CountIncorrect());
+
+  // Pick the set of options to use.
+  emp::BitVector used(options.size());
+  size_t correct_picks = 0, incorrect_picks = 0;
+  while (correct_picks < correct_target || incorrect_picks < incorrect_target) {
+    size_t pick = random.GetUInt64(options.size());
+    if (used[pick]) continue;
+
+    if ((options[pick].is_correct && (correct_picks == correct_target)) ||
+        (!options[pick].is_correct && (incorrect_picks == incorrect_target))) continue;
+
+    used.Set(pick);
+    (options[pick].is_correct ? correct_picks : incorrect_picks)++;
+  }
+
+  // Limit to just the answer options that we're using.
+  for (size_t i = used.size()-1; i < used.size(); --i) {
+    if (!used[i]) options.erase(options.begin() + i);
+  }
+}
+
+void Question::ShuffleOptions(emp::Random & random) {
+  // Find the option range to shuffle.
+  size_t first_id = 0;
+  while (first_id < options.size() && options[first_id].is_fixed) first_id++;
+  size_t last_id = first_id;
+  while (last_id < options.size() && !options[last_id].is_fixed) last_id++;
+
+  emp::ShuffleRange(random, options, first_id, last_id);
 }
 
 void Question::Generate(emp::Random & random) {
   // Collect config info for this question (that wasn't collected in Validate(), above)
-  double alt_p = GetConfig(":alt_prob", 0.5);
+  // double alt_p = GetConfig(":alt_prob", 0.5);
 
+  size_t correct_target = random.GetUInt(correct_range.GetLower(), correct_range.GetUpper()+1);
+  option_range.LimitLower(correct_target);
+  size_t option_target = random.GetUInt(option_range.GetLower(), option_range.GetUpper()+1);
+  size_t incorrect_target = option_target - correct_target;
 
+  // Trim down the set of options if we need to.
+  if (option_target != options.size()) {
+    ReduceOptions(random, correct_target, incorrect_target);
+  }
+
+  // Reorder the possible answers
+  ShuffleOptions(random);
 }
