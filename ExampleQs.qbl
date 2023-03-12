@@ -1,0 +1,40 @@
+Which of the following is NOT a correct way to indicate a newline at the end of "Hello World!"?
+#cout #iostream :options=3-4
+* `std::cout << "Hello World!" << std::endl;`
+* `std::cout << "Hello World!\n";`
+* `std::cout << "Hello World!" << "\n";`
+[*] `std::cout << "Hello World!\endl";`
+* `std::cout << "Hello World!"; std::cout << "\n";`
+*+> `std::cout << "Hello World!"; std::cout << std::endl;`
+
+Which of these numeric types is represented using the fewest bytes in C++?
+#encoding #types1
+* `int`
+[*] `char`
+* `long`
+* `double`
+
++What is the advantage of initializing a variable in C++?
+#initialization
+* It ensures that memory is allocated for the variable at compile time
+* It locks in the scope of the variable 
+[*] It ensures that the variable has a defined value from creation 
+* It locks in a single value for the variable and makes it immutable
+
+What is the value of y after these lines are run in C++?
+    int x = 6;
+    int y = 4 + x * 3 - 1;
+#simple-code #op-order
+* 6
+* 18
+* 29
+[*] 21
+
+Given the following function, which one of the following claims is incorrect? (i.e., find the FALSE statement)
+    int CrazyFun(int & in) { return ++in * 10; }
+#side-effects
+* If x is 0 and I call `CrazyFun(x)` it will return 10
+* If x is 0 and I call `CrazyFun(x)`, x will then be 1
+[*] If x is 10 and I call `CrazyFun(x)` it will return 100
+* if x is 5 and I call `CrazyFun(x)`, x will then be 6
+
