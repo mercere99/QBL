@@ -1,5 +1,5 @@
 Which of the following is NOT a correct way to indicate a newline at the end of "Hello World!"?
-#cout #iostream :options=3-4
+#cout #iostream :options=3-4 #tag1
 * `std::cout << "Hello World!" << std::endl;`
 * `std::cout << "Hello World!\n";`
 * `std::cout << "Hello World!" << "\n";`
@@ -8,14 +8,14 @@ Which of the following is NOT a correct way to indicate a newline at the end of 
 *+> `std::cout << "Hello World!"; std::cout << std::endl;`
 
 Which of these numeric types is represented using the fewest bytes in C++?
-#encoding #types1
+#encoding #types1 #tag1
 * `int`
 [*] `char`
 * `long`
 * `double`
 
 +What is the advantage of initializing a variable in C++?
-#initialization
+#initialization #tag1 #tag2
 * It ensures that memory is allocated for the variable at compile time
 * It locks in the scope of the variable 
 [*] It ensures that the variable has a defined value from creation 
@@ -24,7 +24,7 @@ Which of these numeric types is represented using the fewest bytes in C++?
 What is the value of y after these lines are run in C++?
     int x = 6;
     int y = 4 + x * 3 - 1;
-#simple-code #op-order
+#simple-code #op-order #tag2 #tag3
 * 6
 * 18
 * 29
