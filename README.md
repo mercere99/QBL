@@ -20,8 +20,9 @@ The following flags are also available:
 | `-l` or `--latex`    | Output should be in Latex format.                             |
 | `-o` or `--output`   | Next arg will be the name to use for the output file.         |
 | `-q` or `--qbl`      | Output should be in QBL format.                               |
+| `-r` or `--require`  | Require questions to have this tag for them to be included.   |
 | `-s` or `--set`      | Run the following argument to set a value; e.g. `var=12`.     |
-| `-t` or `--tag`      | Select only those questions with the provided tag.            |
+| `-t` or `--tag`      | All questions with the provided tag must be included.         |
 | `-v` or `--version`  | Print out the current version of the software and stop.       |
 | `-w` or `--web`      | Output should be in HTML format.                              |
 | `-x` or `--exclude`  | Remove all questions with the provided tag; overrides `-t`.   |
@@ -76,11 +77,6 @@ The `*` or `[*]` at the beginning of the line can also have the `*` followed by
 indicate that this option should always be included in random sampling.
 For example, `*>`, `[*>]`, `*+` or `[*+>]` are all legal option beginnings.
 
-If any tags (e.g., keywords beginning with `#`, `^`, or `:` above) are created
-outside of a question definition, they will apply to ALL questions that follow,
-until the end of the current file OR until they are replaced by a new tag
-block.  A `#` by itself on a line will remove the current tag block.
-
 Certain characters also have special meanings in the middle of a line.
 These will all begin with either a back tick (`` ` ``) if we are changing mode or
 formatting, or a backslash (`` \ ``) if we are inserting a special character.
@@ -98,6 +94,11 @@ Examples of special formatting:
   `.Subscript`.
   `~Strikethrough`~
 ```
+
+TO IMPLEMENT: If any tags (e.g., keywords beginning with `#`, `^`, or `:` above) are created
+outside of a question definition, they will apply to ALL questions that follow,
+until the end of the current file OR until they are replaced by a new tag
+block.  A `#` by itself on a line will remove the current tag block.
 
 ## Output formats
 
