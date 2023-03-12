@@ -27,6 +27,9 @@ private:
   size_t include_count=0;           // Number of questions selected for inclusion.
   size_t exclude_count=0;           // Number of questions excluded.
 
+
+  using tag_set_t = emp::vector<String>;
+
   Question & CurQ() {
     if (start_new) {
       questions.emplace_back(questions.size() + 1);
@@ -104,10 +107,25 @@ public:
     include_count++;
   }
 
+  // Scan through all of the questions and remove those that either have an excluded tag or don't have a required tag.
+  void Generate_RemoveExcluded(const tag_set_t & exclude_tags, const tag_set_t & require_tags) {
+    for (size_t i = 0; i < questions.size(); ++i) {
+      for (const auto & tag : exclude_tags) {
+        if (questions[i].HasTag(tag)) Generate_ExcludeQuestion(i, "has exclude tag");
+      }
+      for (const auto & tag : require_tags) {
+        if (!questions[i].HasTag(tag)) Generate_ExcludeQuestion(i, "doesn't have required tag");
+      }
+    }
+  }
+
   // Scan through all of the questions and included the ones we are required to.
-  void Generate_IncludeRequired() {
+  void Generate_IncludeRequired(const tag_set_t & include_tags) {
     for (size_t i = 0; i < questions.size(); ++i) {
       if (questions[i].IsRequired()) Generate_IncludeQuestion(i, "required");
+      for (const auto & tag : include_tags) {
+        if (questions[i].HasTag(tag)) Generate_IncludeQuestion(i, "has include tag");
+      }
     }
   }
 
@@ -118,7 +136,8 @@ public:
     }
   }
 
-  void Generate(size_t count, emp::Random & random) {
+  void Generate(size_t count, emp::Random & random, const tag_set_t & include_tags,
+                const tag_set_t & exclude_tags, const tag_set_t & require_tags) {
     emp::notify::TestError(count > questions.size(), "Requesting more questions (", count,
       ") than available in Question Bank (", questions.size(), ")");
 
@@ -127,7 +146,8 @@ public:
     include_count = 0;
     exclude_count = 0;
 
-    Generate_IncludeRequired();
+    Generate_RemoveExcluded(exclude_tags, require_tags);
+    Generate_IncludeRequired(include_tags);
 
     // Pick them randomly from here; loop as long as we need questions and there are some left.
     while (include_count < count && include_count + exclude_count < questions.size()) {
@@ -149,9 +169,10 @@ public:
     for (auto & q : questions) q.Generate(random);
   }
 
-  void Generate(size_t count) {
+  void Generate(size_t count, const tag_set_t & include_tags,
+                const tag_set_t & exclude_tags, const tag_set_t & require_tags) {
     emp::Random random;
-    Generate(count, random);
+    Generate(count, random, include_tags, exclude_tags, require_tags);
   }
 
   void Print(std::ostream & os=std::cout) const {
