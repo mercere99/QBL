@@ -14,7 +14,7 @@ void Question::Print(std::ostream & os) const {
 
 void Question::PrintD2L(std::ostream & os) const {
   os << "NewQuestion,MC,,,\n"
-    << "ID,CSE231-" << id << ",,,\n"
+    << "ID,QBL-" << id << ",,,\n"
     << "Title,,,,\n"
     << "QuestionText," << TextToD2L(question) << ",HTML,,\n"
     << "Points,5,,,\n"
