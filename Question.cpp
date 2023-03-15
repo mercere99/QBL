@@ -17,11 +17,11 @@ void Question::PrintD2L(std::ostream & os) const {
     << "ID,CSE231-" << id << ",,,\n"
     << "Title,,,,\n"
     << "QuestionText," << TextToD2L(question) << ",HTML,,\n"
-    << "Points,5,,,\n"
+    << "Points,2,,,\n"
     << "Difficulty,1,,,\n"
     << "Image,,,,\n";
   for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
-    os << "Option," << (opt_id == options[opt_id].is_correct ? 100 : 0) << ","
+    os << "Option," << (options[opt_id].is_correct ? 100 : 0) << ","
       << TextToD2L(options[opt_id].text) << ",HTML,No feedback.\n";
   }
   os << "Hint,No hint for this one.,,,\n"
