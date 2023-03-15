@@ -19,8 +19,8 @@ static inline emp::String LineToD2L(emp::String line) {
   for (char c : line) {
     switch (c) {
       case '\"': out_line += "&quot;"; break;
-      case ' ': out_line += "&nbsp;";  break;
-      case ',':  out_line += "&#44;";   break;
+      case ' ': out_line += in_code ? "&nbsp;" : " ";  break;
+      case ',': out_line += "&#44;";   break;
       case '<': out_line += in_code ? "&lt;" : "<"; break;  // Outside code might be HTML
       case '>': out_line += in_code ? "&gt;" : ">"; break;  // Outside code might be HTML
       case '&': out_line += in_code ? "&amp;" : "&"; break;  // Outside code might be HTML
