@@ -23,17 +23,40 @@ void Question::PrintD2L(std::ostream& os) const {
      << "Image,,,,\n";
   for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
     os << "Option," << (options[opt_id].is_correct ? 100 : 0) << ","
-       << TextToD2L(options[opt_id].text) << ",HTML,No feedback.\n";
+       << TextToD2L(options[opt_id].text) << ",HTML,"
+       << options[opt_id].feedback << "\n";
   }
-  os << "Hint,No hint for this one.,,,\n"
-     << "Feedback,No feedback,HTML,,\n"
+  os << "Hint," << hint << ",,,\n"
+     << "Feedback," << feedback << ",HTML,,\n"
      << ",,,,\n"
      << ",,,,\n";
 }
 
 void Question::PrintHTML(std::ostream& os) const { os << std::endl; }
 
-void Question::PrintLatex(std::ostream& os) const { os << std::endl; }
+void Question::PrintLatex(std::ostream& os) const {
+  os << "% QUESTION " << id << "\n"
+     << "\\question " << TextToLatex(question) << "\n"
+     << std::endl
+     << "\\begin{mcanswerslist}";
+  size_t fixed_count = CountFixed();
+  if (fixed_count) {
+    if (fixed_count == 1 && HasFixedLast()) {
+      os << "[fixlast]";
+    } else {
+      os << "[permutenone]";
+    }
+  }
+  os << std::endl;
+
+  for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
+    os << " \\answer";
+    if (options[opt_id].is_correct) os << "[correct]";
+    os << " " << TextToLatex(options[opt_id].text) << '\n';
+  }
+
+  os << "\\end{mcanswerslist}\n" << std::endl;
+}
 
 void Question::Validate() {
   // Collect config info for this question.

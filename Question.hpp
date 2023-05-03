@@ -23,6 +23,7 @@ private:
     bool is_correct;   ///< Is this option marked as a correct answer?
     bool is_fixed;     ///< Is this option in a fixed position?
     bool is_required;  ///< Does this option have to be included?
+    String feedback;   ///< Feedback for a student picking this option.
 
     String GetQBLBullet() const {
       String out("*");
@@ -37,6 +38,8 @@ private:
   emp::String alt_question;              ///< Toggled wording for this question.
   emp::vector<Option> options;
   size_t id = (size_t) -1;
+  emp::String hint;
+  emp::String feedback;
 
   emp::vector<String> base_tags;
   emp::vector<String> exclusive_tags;
@@ -108,6 +111,8 @@ public:
     { return Count([](const Option & o){ return o.is_correct && o.is_required; }); }
   size_t CountFixed() const { return Count([](const Option & o){ return o.is_fixed; }); }
 
+  bool HasFixedLast() const { return options.size() && options.back().is_fixed; }
+
   void AddText(const emp::String & line) {
     // Text with a start symbol would have been directed elsewhere.  Regular text is either a
     // question or an extension of the last thing being written.
@@ -139,7 +144,8 @@ public:
       Option{option,            // Option text.
             (tag[0] == '['),    // Is it correct?
             tag.Has('>'),       // Is it in a fixed position?
-            tag.Has('+')        // Is it required?
+            tag.Has('+'),       // Is it required?
+            ""                  // Feedback to student
             });      
       last_edit = Section::OPTIONS;
   }  

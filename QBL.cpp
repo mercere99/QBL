@@ -136,6 +136,7 @@ public:
   void Print(std::ostream & os, Format out_format) const {
     if (out_format == Format::QBL || out_format == Format::NONE) qbank.Print(os);
     else if (out_format == Format::D2L) qbank.PrintD2L(os);
+    else if (out_format == Format::LATEX) qbank.PrintLatex(os);
     else if (out_format == Format::DEBUG) PrintDebug(os);
   }
 
