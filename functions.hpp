@@ -83,6 +83,8 @@ static inline emp::String LineToLatex(emp::String line) {
       case '%': out_line += "\\%";  break;
       case '$': out_line += "\\$";  break;
       case '~': out_line += "\\~";  break;
+      case '#': out_line += "\\#";  break;
+      case '_': out_line += "\\_";  break;
 
       // Replace ` with \texttt{ or }
       case '`':
