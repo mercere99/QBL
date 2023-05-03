@@ -55,3 +55,61 @@ static inline emp::String TextToD2L(const emp::String & text) {
   for (auto & line : lines) line = LineToD2L(line);
   return emp::Join(lines, "<br>");
 }
+
+
+static inline emp::String LineToLatex(emp::String line) {
+  emp::notify::TestError(line.Has('\n'), "Newline found inside of line: ", line);
+  emp::String out_line;
+
+  bool in_codeblock = line.HasPrefix("    ");
+  bool in_code = in_codeblock;
+
+  if (in_codeblock) {
+    line.PopFixed(4);
+    out_line += "\\texttt{";
+
+    size_t ws_count = 0;
+    while (ws_count < line.size() && line[ws_count] == ' ') ws_count++;
+    if (ws_count) {
+      out_line += emp::MakeString("\\hspace*{", ws_count, "em}");
+      line.PopFixed(ws_count);
+    }
+  }
+
+  for (char c : line) {
+    switch (c) {
+      case '{': out_line += "\\{";  break;
+      case '}': out_line += "\\}";  break;
+      case '%': out_line += "\\%";  break;
+      case '$': out_line += "\\$";  break;
+      case '~': out_line += "\\~";  break;
+
+      // Replace ` with \texttt{ or }
+      case '`':
+        if (in_codeblock) {
+          out_line += '`';
+        } else {
+          if (in_code) out_line += "}";
+          else out_line += "\\texttt{";
+          in_code = !in_code;
+        }
+        break;
+
+      default:
+        out_line += c;
+        break;
+    }
+  }
+
+  // If we are in code at the end of the entry, close it off.
+  if (in_code) out_line += "}";
+
+  return out_line;
+}
+
+// Convert a whole text block to Latex format.
+static inline emp::String TextToLatex(const emp::String & text) {
+  emp::vector<emp::String> lines = text.Slice("\n");
+  for (auto & line : lines) line = LineToLatex(line);
+  return emp::Join(lines, "\\\\\n");
+}
