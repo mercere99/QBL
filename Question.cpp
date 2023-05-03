@@ -22,10 +22,11 @@ void Question::PrintD2L(std::ostream & os) const {
     << "Image,,,,\n";
   for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
     os << "Option," << (options[opt_id].is_correct ? 100 : 0) << ","
-      << TextToD2L(options[opt_id].text) << ",HTML,No feedback.\n";
+      << TextToD2L(options[opt_id].text) << ",HTML,"
+      << options[opt_id].feedback << "\n";
   }
-  os << "Hint,No hint for this one.,,,\n"
-    << "Feedback,No feedback,HTML,,\n"
+  os << "Hint," << hint << ",,,\n"
+    << "Feedback," << feedback << ",HTML,,\n"
     << ",,,,\n"
     << ",,,,\n";
 }
