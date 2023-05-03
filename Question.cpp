@@ -36,7 +36,29 @@ void Question::PrintHTML(std::ostream & os) const {
 }
 
 void Question::PrintLatex(std::ostream & os) const {
+  os << "% QUESTION " << id << "\n"
+     << "\\question " << TextToLatex(question) << "\n"
+     << std::endl
+     << "\\begin{mcanswerslist}";
+  size_t fixed_count = CountFixed();
+  if (fixed_count) {
+    if (fixed_count == 1 && HasFixedLast()) {
+      os << "[fixlast]";
+    } else {
+      os << "[permutenone]";
+    }
+  }
   os << std::endl;
+
+  for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
+    os << " \\answer";
+    if (options[opt_id].is_correct) os << "[correct]";
+    os << " " << TextToLatex(options[opt_id].text) << '\n';
+  }
+
+  os << "\\end{mcanswerslist}\n" << std::endl;
+
+
 }
 
 void Question::Validate() {
