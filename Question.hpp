@@ -111,6 +111,8 @@ public:
     { return Count([](const Option & o){ return o.is_correct && o.is_required; }); }
   size_t CountFixed() const { return Count([](const Option & o){ return o.is_fixed; }); }
 
+  bool HasFixedLast() const { return options.size() && options.back().is_fixed; }
+
   void AddText(const emp::String & line) {
     // Text with a start symbol would have been directed elsewhere.  Regular text is either a
     // question or an extension of the last thing being written.
