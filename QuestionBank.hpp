@@ -193,6 +193,12 @@ public:
     }
   }
 
+  void PrintJS(std::ostream & os=std::cout) const {
+    for (size_t id = 0; id < questions.size(); ++id) {
+      questions[id].PrintJS(os);
+    }
+  }
+
   void PrintLatex(std::ostream & os=std::cout) const {
     for (size_t id = 0; id < questions.size(); ++id) {
       questions[id].PrintLatex(os);

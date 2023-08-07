@@ -21,18 +21,19 @@ private:
     NONE=0,
     QBL,
     D2L,
-    HTML,
     LATEX,
+    WEB,
     DEBUG
   };
 
-  Format format = Format::NONE;        // No format set yet.
-  String out_filename = "";            // Output filename; empty = no file; "_interact_" for interactive
-  emp::vector<String> include_tags;    // Questions with tags should all be included.
-  emp::vector<String> exclude_tags;    // Questions with these tags should all be excluded.
-  emp::vector<String> require_tags;    // Only questions with these tags should be included.
+  Format format = Format::NONE;       // No format set yet.
+  String base_filename = "";          // Output filename; empty=no file; "_interact_"=interactive
+  String extension = "";              // Provided extension to use for output file. 
+  emp::vector<String> include_tags;   // Questions with tags should all be included.
+  emp::vector<String> exclude_tags;   // Questions with these tags should all be excluded.
+  emp::vector<String> require_tags;   // Only questions with these tags should be included.
   emp::vector<String> question_files;
-  size_t generate_count = 0;           // How many questions should be generated? (0 = use all)
+  size_t generate_count = 0;          // How many questions should be generated? (0 = use all)
 
 public:
   QBL(int argc, char * argv[]) : flags(argc, argv) {
@@ -60,8 +61,8 @@ public:
       "Select only those questions with the following tag.");
     flags.AddOption('v', "--version", [this](){ PrintVersion(); },
       "Provide QBL version information.");
-    flags.AddOption('w', "--web",     [this](){ SetFormat(Format::HTML); },
-      "Set output to HTML format.");
+    flags.AddOption('w', "--web",     [this](){ SetFormat(Format::WEB); },
+      "Set output to HTML/CSS/JS format.");
     flags.AddOption('x', "--exclude", [this](String arg){exclude_tags.push_back(arg);},
       "Remove all questions with following tag; overrides `-t`.");
 
@@ -77,12 +78,21 @@ public:
   }
 
   void SetOutput(String _filename, bool update_ok=false) {
-    if (out_filename.size() && !update_ok) {
+    if (base_filename.size() && !update_ok) {
       emp::notify::Error("Only one output mode allowed at a time.");
       exit(1);
     }
     std::cout << "Directing output to file '" << _filename << "'." << std::endl;
-    out_filename = _filename;
+    size_t dot_pos = _filename.RFind('.');      
+    base_filename = _filename.substr(0, dot_pos);
+    extension = _filename.View(dot_pos);
+    // If we don't have a format yet, set it based on the filename.
+    if (format == Format::NONE) {
+      if (extension == ".csv" || extension == ".d2l") format = Format::D2L;
+      else if (extension == ".html" || extension == ".htm") format = Format::WEB;
+      else if (extension == ".tex") format = Format::LATEX;
+      else if (extension == ".qbl") format = Format::QBL;
+    }
   }
 
   void SetGenerate(String _count) {
@@ -106,9 +116,9 @@ public:
     switch (id) {
     case Format::NONE: return "NONE";
     case Format::D2L: return "D2L";
-    case Format::HTML: return "HTML";
     case Format::LATEX: return "LATEX";
     case Format::QBL: return "QBL";
+    case Format::WEB: return "WEB";
     case Format::DEBUG: return "Debug";
     };
 
@@ -133,34 +143,43 @@ public:
     if (generate_count) qbank.Generate(generate_count, include_tags, exclude_tags, require_tags);
   }
 
-  void Print(std::ostream & os, Format out_format) const {
+  void Print(Format out_format, std::ostream & os=std::cout, std::ostream & os2=std::cout) const {
     if (out_format == Format::QBL || out_format == Format::NONE) qbank.Print(os);
     else if (out_format == Format::D2L) qbank.PrintD2L(os);
     else if (out_format == Format::LATEX) qbank.PrintLatex(os);
+    else if (out_format == Format::WEB) PrintWeb(os, os2);
     else if (out_format == Format::DEBUG) PrintDebug(os);
   }
 
   void Print() const {
-    Format out_format = format;
-    if (out_filename.size()) {
-      // If we have not specified the format, see if we can determine it from the filename.
-      if (format == Format::NONE) {
-        auto extension = out_filename.ViewBackTo('.');
-        if (extension == ".csv" || extension == ".d2l") out_format = Format::D2L;
-        else if (extension == ".html" || extension == ".htm") out_format = Format::HTML;
-        else if (extension == ".tex") out_format = Format::LATEX;
-        else if (extension == ".qbl") out_format = Format::QBL;
+    // If there is no filename, just print to standard out.
+    if (!base_filename.size()) { Print(format); return; }
+
+    std::ofstream main_file(base_filename + extension);
+
+    switch (format) {
+      case Format::D2L:
+      case Format::LATEX:
+      case Format::QBL:
+      case Format::NONE:
+        Print(format, main_file);
+        break;
+      case Format::WEB: {
+        std::ofstream js_file(base_filename + ".js");
+        Print(format, main_file, js_file);
       }
-      std::ofstream file(out_filename);
-      Print(file, out_format);
     }
-    else Print(std::cout, out_format);
   }
 
+  void PrintWeb(std::ostream & html_out, std::ostream & js_out) const {
+    qbank.PrintHTML(html_out);
+    qbank.PrintJS(js_out);
+  }
 
   void PrintDebug(std::ostream & os=std::cout) const {
    os << "Question Files: " << emp::MakeLiteral(question_files) << "\n"
-      << "Output filename: " << out_filename << "\n"
+      << "Base filename: " << base_filename << "\n"
+      << "... extension: " << extension << "\n"
       << "Output Format: " << GetFormatName(format) << "\n"
       << "Include tags: " << emp::MakeLiteral(include_tags) << "\n"
       << "Exclude tags: " << emp::MakeLiteral(exclude_tags) << "\n"

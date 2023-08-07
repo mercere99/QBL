@@ -35,6 +35,10 @@ void Question::PrintHTML(std::ostream & os) const {
   os << std::endl;
 }
 
+void Question::PrintJS(std::ostream & os) const {
+  os << std::endl;
+}
+
 void Question::PrintLatex(std::ostream & os) const {
   os << "% QUESTION " << id << "\n"
      << "\\question " << TextToLatex(question) << "\n"
@@ -51,7 +55,7 @@ void Question::PrintLatex(std::ostream & os) const {
   os << std::endl;
 
   for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
-    os << " \\answer";
+    os << " QBL.cpp\\answer";
     if (options[opt_id].is_correct) os << "[correct]";
     os << " " << TextToLatex(options[opt_id].text) << '\n';
   }
