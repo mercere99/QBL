@@ -32,7 +32,17 @@ void Question::PrintD2L(std::ostream & os) const {
 }
 
 void Question::PrintHTML(std::ostream & os) const {
-  os << std::endl;
+  os
+  << "  <!-- Question " << id << " -->\n"
+  << "  <div class=\"question\">\n"
+  << "    <p>" << id << ". " << TextToHTML(question) <<  "</p>\n";
+  for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
+    os << "    <label><input type=\"radio\" name=\"q" << id
+       << "\" value=\"opt" << opt_id << "\">"
+       << TextToHTML(options[opt_id].text) << "</label>\n";
+  }
+  os << "</div>\n";
+  os << std::endl; // Skip a line.
 }
 
 void Question::PrintJS(std::ostream & os) const {
