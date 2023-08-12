@@ -172,6 +172,22 @@ public:
   }
 
   void PrintWeb(std::ostream & html_out, std::ostream & js_out) const {
+    // Print the header for the HTML file.
+    html_out
+    << "<!DOCTYPE html>\n"
+    << "<html lang=\"en\">\n"
+    << "<head>\n"
+    << "  <meta charset=\"UTF-8\">\n"
+    << "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n"
+    << "  <title>Multiple Choice Quiz</title>\n"
+    << "  <link rel=\"stylesheet\" href=\"styles.css\">\n"
+    << "</head>\n"
+    << "<body>\n"
+    << "\n"
+    << "<form id=\"quizForm\">\n"
+    << "  <h1>Multiple Choice Quiz</h1>\n"
+    << "\n";
+
     qbank.PrintHTML(html_out);
     qbank.PrintJS(js_out);
   }
