@@ -108,6 +108,7 @@ public:
 
   void PrintHelp() const {
     PrintVersion();
+    std::cout << "Usage: " << flags[0] << " [flags] [questions_file]\n";
     flags.PrintOptions();
     exit(0);
   }
