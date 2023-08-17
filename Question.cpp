@@ -46,7 +46,10 @@ void Question::PrintHTML(std::ostream & os) const {
 }
 
 void Question::PrintJS(std::ostream & os) const {
-  os << std::endl;
+  emp::notify::TestWarning(CountCorrect() == 1,
+    "HTML mode expects exactly one correct answer per question; ", CountCorrect(), " found.");
+  os << "    q" << id << ": \"opt" << FindCorrectID() << "\",\n"
+     << std::endl;
 }
 
 void Question::PrintLatex(std::ostream & os) const {
