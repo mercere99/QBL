@@ -190,6 +190,16 @@ public:
     << "\n";
 
     qbank.PrintHTML(html_out);
+
+    // Print Footer for the HTML file.
+    html_out
+    << "      <input type=\"submit\" value=\"Submit\">\n"
+    << "</form>\n"
+    << "<div id=\"results\"></div>\n"
+    << "<script src=\"" << base_filename << ".js\"></script>\n"
+    << "</body>\n"
+    << "</html>\n";
+
     qbank.PrintJS(js_out);
   }
 
