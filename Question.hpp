@@ -111,6 +111,13 @@ public:
     { return Count([](const Option & o){ return o.is_correct && o.is_required; }); }
   size_t CountFixed() const { return Count([](const Option & o){ return o.is_fixed; }); }
 
+  size_t FindCorrectID(size_t start=0) const {
+    for (size_t i = start; i < options.size(); ++i) {
+      if (options[i].is_correct) return i;
+    }
+    return static_cast<size_t>(-1);
+  }
+
   bool HasFixedLast() const { return options.size() && options.back().is_fixed; }
 
   void AddText(const emp::String & line) {
