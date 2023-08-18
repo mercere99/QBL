@@ -200,7 +200,48 @@ public:
     << "</body>\n"
     << "</html>\n";
 
+    // Print Header for the JS file.
+    js_out
+    << "document.getElementById('quizForm').addEventListener('submit', function(event) {\n"
+    << "  event.preventDefault(); // Prevent form from submitting to a server\n"
+    << "  let correctAnswers = {\n";
+
     qbank.PrintJS(js_out);
+
+    // Print Footer for the JS file.
+    js_out
+    << "  };\n"
+    << "\n"
+    << "  let userAnswers = {};\n"
+    << "  for (let key in correctAnswers) {\n"
+    << "    userAnswers[key] = document.querySelector(`input[name=\"${key}\"]:checked`).value;\n"
+    << "  }\n"
+    << "\n"
+    << "  let score = 0;\n"
+    << "  let incorrectAnswers = [];\n"
+    << "\n"
+    << "  for (let key in correctAnswers) {\n"
+    << "    if (userAnswers[key] === correctAnswers[key]) {\n"
+    << "      score++;\n"
+    << "    } else {\n"
+    << "      incorrectAnswers.push({\n"
+    << "        question: key,\n"
+    << "        correctAnswer: correctAnswers[key]\n"
+    << "      });\n"
+    << "    }\n"
+    << "  }\n"
+    << "\n"
+    << "  displayResults(score, incorrectAnswers);\n"
+    << "});\n"
+    << "\n"
+    << "function displayResults(score, incorrectAnswers) {\n"
+    << "  let resultsDiv = document.getElementById('results');\n"
+    << "  resultsDiv.innerHTML = `<p>You got ${score} out of ${Object.keys(incorrectAnswers).length + score} correct!</p>`;\n"
+    << "\n"
+    << "  incorrectAnswers.forEach(item => {\n"
+    << "    resultsDiv.innerHTML += `<p>For ${item.question}, the correct answer is ${item.correctAnswer}</p>`;\n"
+    << "  });\n"
+    << "}\n";
   }
 
   void PrintDebug(std::ostream & os=std::cout) const {
