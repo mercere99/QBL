@@ -144,11 +144,12 @@ public:
     if (generate_count) qbank.Generate(generate_count, include_tags, exclude_tags, require_tags);
   }
 
-  void Print(Format out_format, std::ostream & os=std::cout, std::ostream & os2=std::cout) const {
+  void Print(Format out_format, std::ostream & os=std::cout,
+             std::ostream & os2=std::cout, std::ostream & os3=std::cout) const {
     if (out_format == Format::QBL || out_format == Format::NONE) qbank.Print(os);
     else if (out_format == Format::D2L) qbank.PrintD2L(os);
     else if (out_format == Format::LATEX) qbank.PrintLatex(os);
-    else if (out_format == Format::WEB) PrintWeb(os, os2);
+    else if (out_format == Format::WEB) PrintWeb(os, os2, os3);
     else if (out_format == Format::DEBUG) PrintDebug(os);
   }
 
@@ -167,12 +168,13 @@ public:
         break;
       case Format::WEB: {
         std::ofstream js_file(base_filename + ".js");
-        Print(format, main_file, js_file);
+        std::ofstream css_file(base_filename + ".css");
+        Print(format, main_file, js_file, css_file);
       }
     }
   }
 
-  void PrintWeb(std::ostream & html_out, std::ostream & js_out) const {
+  void PrintWeb(std::ostream & html_out, std::ostream & js_out, std::ostream & css_out) const {
     // Print the header for the HTML file.
     html_out
     << "<!DOCTYPE html>\n"
@@ -181,7 +183,7 @@ public:
     << "  <meta charset=\"UTF-8\">\n"
     << "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n"
     << "  <title>Multiple Choice Quiz</title>\n"
-    << "  <link rel=\"stylesheet\" href=\"styles.css\">\n"
+    << "  <link rel=\"stylesheet\" href=\"" << base_filename << ".css\">\n"
     << "</head>\n"
     << "<body>\n"
     << "\n"
@@ -241,6 +243,34 @@ public:
     << "  incorrectAnswers.forEach(item => {\n"
     << "    resultsDiv.innerHTML += `<p>For ${item.question}, the correct answer is ${item.correctAnswer}</p>`;\n"
     << "  });\n"
+    << "}\n";
+
+    // Print the CSS file.
+    css_out
+    << "body {\n"
+    << "  font-family: Arial, sans-serif;\n"
+    << "  margin: 50px;\n"
+    << "}\n"
+    << "\n"
+    << ".question {\n"
+    << "  margin-bottom: 20px;\n"
+    << "}\n"
+    << "\n"
+    << "label {\n"
+    << "  display: block;\n"
+    << "  margin-bottom: 5px;\n"
+    << "}\n"
+    << "\n"
+    << "input[type=\"submit\"] {\n"
+    << "  padding: 10px 15px;\n"
+    << "  background-color: #007BFF;\n"
+    << "  color: white;\n"
+    << "  border: none;\n"
+    << "  cursor: pointer;\n"
+    << "}\n"
+    << "\n"
+    << "input[type=\"submit\"]:hover {\n"
+    << "  background-color: #0056b3;\n"
     << "}\n";
   }
 
