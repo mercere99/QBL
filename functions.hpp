@@ -49,14 +49,6 @@ static inline emp::String LineToD2L(emp::String line) {
   return out_line;
 }
 
-// Convert a whole text block to D2L format.
-static inline emp::String TextToD2L(const emp::String & text) {
-  emp::vector<emp::String> lines = text.Slice("\n");
-  for (auto & line : lines) line = LineToD2L(line);
-  return emp::Join(lines, "<br>");
-}
-
-
 static inline emp::String LineToLatex(emp::String line) {
   emp::notify::TestError(line.Has('\n'), "Newline found inside of line: ", line);
   emp::String out_line;
@@ -109,14 +101,6 @@ static inline emp::String LineToLatex(emp::String line) {
   return out_line;
 }
 
-// Convert a whole text block to Latex format.
-static inline emp::String TextToLatex(const emp::String & text) {
-  emp::vector<emp::String> lines = text.Slice("\n");
-  for (auto & line : lines) line = LineToLatex(line);
-  return emp::Join(lines, "\\\\\n");
-}
-
-
 static inline emp::String LineToHTML(emp::String line) {
   emp::notify::TestError(line.Has('\n'), "Newline found inside of line: ", line);
   emp::String out_line;
@@ -167,9 +151,23 @@ static inline emp::String LineToHTML(emp::String line) {
   return out_line;
 }
 
+// Convert a whole text block to D2L format.
+static inline emp::String TextToD2L(const emp::String & text) {
+  emp::vector<emp::String> lines = text.Slice("\n");
+  for (auto & line : lines) line = LineToD2L(line);
+  return emp::Join(lines, "<br>");
+}
+
+// Convert a whole text block to Latex format.
+static inline emp::String TextToLatex(const emp::String & text) {
+  emp::vector<emp::String> lines = text.Slice("\n");
+  for (auto & line : lines) line = LineToLatex(line);
+  return emp::Join(lines, "\\\\\n");
+}
+
 // Convert a whole text block to HTML format.
 static inline emp::String TextToHTML(const emp::String & text) {
   emp::vector<emp::String> lines = text.Slice("\n");
   for (auto & line : lines) line = LineToHTML(line);
-  return emp::Join(lines, "\\\\\n");
+  return emp::Join(lines, "<br>\n");
 }
