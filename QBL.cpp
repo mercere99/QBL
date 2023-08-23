@@ -144,13 +144,15 @@ public:
     if (generate_count) qbank.Generate(generate_count, include_tags, exclude_tags, require_tags);
   }
 
-  void Print(Format out_format, std::ostream & os=std::cout,
-             std::ostream & os2=std::cout, std::ostream & os3=std::cout) const {
-    if (out_format == Format::QBL || out_format == Format::NONE) qbank.Print(os);
-    else if (out_format == Format::D2L) qbank.PrintD2L(os);
-    else if (out_format == Format::LATEX) qbank.PrintLatex(os);
-    else if (out_format == Format::WEB) PrintWeb(os, os2, os3);
-    else if (out_format == Format::DEBUG) PrintDebug(os);
+  void Print(Format out_format, std::ostream & os=std::cout) const {
+    switch (out_format) {
+      case Format::QBL:   qbank.Print(os); break;
+      case Format::NONE:  qbank.Print(os); break;
+      case Format::D2L:   qbank.PrintD2L(os); break;
+      case Format::LATEX: qbank.PrintLatex(os); break;
+      case Format::WEB:   emp::notify::Error("Web output must go to files."); break;
+      case Format::DEBUG: PrintDebug(os); break;
+    }
   }
 
   void Print() const {
@@ -158,20 +160,12 @@ public:
     if (!base_filename.size()) { Print(format); return; }
 
     std::ofstream main_file(base_filename + extension);
-
-    switch (format) {
-      case Format::D2L:
-      case Format::LATEX:
-      case Format::QBL:
-      case Format::NONE:
-        Print(format, main_file);
-        break;
-      case Format::WEB: {
-        std::ofstream js_file(base_filename + ".js");
-        std::ofstream css_file(base_filename + ".css");
-        Print(format, main_file, js_file, css_file);
-      }
+    if (format == Format::WEB) {
+      std::ofstream js_file(base_filename + ".js");
+      std::ofstream css_file(base_filename + ".css");
+      PrintWeb(main_file, js_file, css_file);
     }
+    else Print(format, main_file);
   }
 
   void PrintWeb(std::ostream & html_out, std::ostream & js_out, std::ostream & css_out) const {
