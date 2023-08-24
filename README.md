@@ -16,21 +16,35 @@ exam.
 
 The following flags are also available:
 
+### General
 | Flag                 | Meaning                                                       |
 | -------------------- | ------------------------------------------------------------- |
-| `-d` or `--d2l`      | Output should be in D2L / Brightspace csv quiz upload format. |
 | `-g` or `--generate` | Specify the number of questions to randomly generate.         |
 | `-h` or `--help`     | Provide additional information for using QBL and stop.        |
-| `-i` or `--interact` | Output should be interactive on the command line.             |
-| `-l` or `--latex`    | (TO IMPLEMENT) Output should be in Latex format.                             |
 | `-o` or `--output`   | Next arg will be the name to use for the output file.         |
-| `-q` or `--qbl`      | Output should be in QBL format.                               |
-| `-r` or `--require`  | Require questions to have this tag for them to be included.   |
 | `-s` or `--set`      | (TO IMPLEMENT) Run the following argument to set a value; e.g. `var=12`. |
-| `-t` or `--tag`      | All questions with the provided tag must be included.         |
+| `-t` or `--title`    | Specify the title to use for the generated quiz.              |
 | `-v` or `--version`  | Print out the current version of the software and stop.       |
-| `-w` or `--web`      | (TO IMPLEMENT) Output should be in HTML format.                              |
-| `-x` or `--exclude`  | Remove all questions with the provided tag; overrides `-t`.   |
+
+### Output types
+| Flag                 | Meaning                                                       |
+| -------------------- | ------------------------------------------------------------- |
+| `-d` or `--d2l`      | Output to D2L / Brightspace csv quiz upload format.           |
+| `-l` or `--latex`    | (TO IMPLEMENT) Output to Latex format (partial functionality) |
+| `-q` or `--qbl`      | Output to QBL format.                                         |
+| `-w` or `--web`      | Output to HTML format.                                        |
+
+### Tag management
+| Flag                 | Meaning                                                       |
+| -------------------- | ------------------------------------------------------------- |
+| `-i` or `--include`  | All questions with the provided tag must be included.         |
+| `-r` or `--require`  | Only questions with the provided tag will be considered for inclusion. |
+| `-x` or `--exclude`  | All questions with the provided tag must be excluded.   |
+
+Note: All exclusions occur _before_ any questions are included.  Thus if a question has both
+an include and exclude tag, exclusion takes priority.  Likewise if it is missing a required tag,
+it will always be excluded.
+
 
 ## Question format
 
