@@ -38,7 +38,8 @@ void Question::PrintHTML(std::ostream & os) const {
   << "    <p>" << id << ". " << TextToHTML(question) <<  "</p>\n";
   for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
     os << "    <label><input type=\"radio\" name=\"q" << id
-       << "\" value=\"opt" << opt_id << "\">"
+       << "\" value=\"" << _OptionLabel(opt_id) << "\">"
+       << _OptionLabel(opt_id) << " "
        << TextToHTML(options[opt_id].text) << "</label>\n";
   }
   os << "  <div class=\"answer\" data-question=\"q" << id << "\"></div> <!-- Placeholder for answer -->"
@@ -49,7 +50,7 @@ void Question::PrintHTML(std::ostream & os) const {
 void Question::PrintJS(std::ostream & os) const {
   emp::notify::TestWarning(CountCorrect() != 1,
     "Web mode expects exactly one correct answer per question; ", CountCorrect(), " found.");
-  os << "    q" << id << ": \"opt" << FindCorrectID() << "\",\n"
+  os << "    q" << id << ": \"" << _OptionLabel(FindCorrectID()) << "\",\n"
      << std::endl;
 }
 
@@ -81,8 +82,8 @@ void Question::PrintLatex(std::ostream & os) const {
 
 void Question::Validate() {
   // Collect config info for this question.
-  correct_range = GetConfig(":correct", emp::Range<size_t>(1,1));
-  option_range = GetConfig(":options", emp::Range<size_t>(options.size(),options.size()));
+  correct_range = _GetConfig(":correct", emp::Range<size_t>(1,1));
+  option_range = _GetConfig(":options", emp::Range<size_t>(options.size(),options.size()));
 
   // Are there enough correct answers?
   const size_t correct_count = CountCorrect();
@@ -169,7 +170,7 @@ void Question::ShuffleOptions(emp::Random & random) {
 
 void Question::Generate(emp::Random & random) {
   // Collect config info for this question (that wasn't collected in Validate(), above)
-  // double alt_p = GetConfig(":alt_prob", 0.5);
+  // double alt_p = _GetConfig(":alt_prob", 0.5);
 
   size_t correct_target = random.GetUInt(correct_range.GetLower(), correct_range.GetUpper()+1);
   option_range.LimitLower(correct_target);
