@@ -60,24 +60,26 @@ private:
   };
   Section last_edit = Section::NONE;
 
+  // Helper functions
+
   template <typename T>
-  static emp::Range<T> StringToRange(String val) {
+  static emp::Range<T> _StringToRange(String val) {
     T val1 = val.Pop("-").As<T>();               // Respect a dash if there is one.
     T val2 = val.size() ? val.As<T>() : val1;
     return emp::MakeRange(val1, val2);
   }
 
   template <typename T>
-  T GetConfig(String name, T default_val=T{}) {
+  T _GetConfig(String name, T default_val=T{}) {
     if (!emp::Has(config_tags, name)) return default_val;
     const String & val = config_tags[name];
 
     // Ranges should allow a dash.
     if constexpr (std::is_same_v<T,emp::Range<size_t>>) {
-      return StringToRange<size_t>(val);
+      return _StringToRange<size_t>(val);
     }
     else if constexpr (std::is_same_v<T,emp::Range<double>>) {
-      return StringToRange<double>(val);
+      return _StringToRange<double>(val);
     }
     else {
       return val.As<T>();
@@ -85,8 +87,12 @@ private:
   }
 
   template <typename FUN_T>
-  size_t Count(FUN_T fun) const {
+  size_t _Count(FUN_T fun) const {
     return std::count_if(options.begin(), options.end(), fun);
+  }
+
+  String _OptionLabel(size_t id) const {
+    return emp::MakeString('(', static_cast<char>('A'+id), ')');
   }
 
 public:
@@ -104,12 +110,12 @@ public:
   void SetFixed() { is_fixed = true; }
   void SetRequired() { is_required = true; }
 
-  size_t CountCorrect() const { return Count([](const Option & o){ return o.is_correct; }); }
-  size_t CountIncorrect() const { return Count([](const Option & o){ return !o.is_correct; }); }
-  size_t CountRequired() const { return Count([](const Option & o){ return o.is_required; }); }
+  size_t CountCorrect() const { return _Count([](const Option & o){ return o.is_correct; }); }
+  size_t CountIncorrect() const { return _Count([](const Option & o){ return !o.is_correct; }); }
+  size_t CountRequired() const { return _Count([](const Option & o){ return o.is_required; }); }
   size_t CountRequiredCorrect() const
-    { return Count([](const Option & o){ return o.is_correct && o.is_required; }); }
-  size_t CountFixed() const { return Count([](const Option & o){ return o.is_fixed; }); }
+    { return _Count([](const Option & o){ return o.is_correct && o.is_required; }); }
+  size_t CountFixed() const { return _Count([](const Option & o){ return o.is_fixed; }); }
 
   size_t FindCorrectID(size_t start=0) const {
     for (size_t i = start; i < options.size(); ++i) {
