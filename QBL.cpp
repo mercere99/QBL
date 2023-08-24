@@ -200,7 +200,7 @@ public:
 
     // Print Footer for the HTML file.
     html_out
-    << "      <input type=\"submit\" value=\"Submit\">\n"
+    << "      <input type=\"submit\" value=\"Check Answers\">\n"
     << "</form>\n"
     << "<div id=\"results\"></div>\n"
     << "<script src=\"" << base_filename << ".js\"></script>\n"
@@ -242,13 +242,29 @@ public:
     << "  displayResults(score, incorrectAnswers);\n"
     << "});\n"
     << "\n"
+
+    // << "function displayResults(score, incorrectAnswers) {\n"
+    // << "  let resultsDiv = document.getElementById('results');\n"
+    // << "  resultsDiv.innerHTML = `<p>You got ${score} out of ${Object.keys(incorrectAnswers).length + score} correct!</p>`;\n"
+    // << "\n"
+    // << "  incorrectAnswers.forEach(item => {\n"
+    // << "    resultsDiv.innerHTML += `<p>For ${item.question}, the correct answer is ${item.correctAnswer}</p>`;\n"
+    // << "  });\n"
+    // << "}\n";
+
     << "function displayResults(score, incorrectAnswers) {\n"
-    << "  let resultsDiv = document.getElementById('results');\n"
-    << "  resultsDiv.innerHTML = `<p>You got ${score} out of ${Object.keys(incorrectAnswers).length + score} correct!</p>`;\n"
+    << "    let resultsDiv = document.getElementById('results');\n"
+    << "    resultsDiv.innerHTML = `<p>You got ${score} out of ${Object.keys(incorrectAnswers).length + score} correct!</p>`;\n"
     << "\n"
-    << "  incorrectAnswers.forEach(item => {\n"
-    << "    resultsDiv.innerHTML += `<p>For ${item.question}, the correct answer is ${item.correctAnswer}</p>`;\n"
-    << "  });\n"
+    << "    // Reset all answer texts\n"
+    << "    let answerDivs = document.querySelectorAll('.answer');\n"
+    << "    answerDivs.forEach(div => div.innerHTML = \"\");\n"
+    << "\n"
+    << "    incorrectAnswers.forEach(item => {\n"
+    << "        let answerDiv = document.querySelector(`.answer[data-question=\"${item.question}\"]`);\n"
+    << "        answerDiv.innerHTML = `Correct answer: ${item.correctAnswer}`;\n"
+    << "        answerDiv.style.color = \"red\"; // Optional: make it visually distinct\n"
+    << "    });\n"
     << "}\n";
 
     // Print the CSS file.
