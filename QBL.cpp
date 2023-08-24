@@ -33,6 +33,7 @@ private:
   emp::vector<String> include_tags;   // Include ALL questions with these tags.
   emp::vector<String> exclude_tags;   // Exclude ALL questions with these tags (override includes)
   emp::vector<String> require_tags;   // ONLY questions with these tags can be included.
+  emp::vector<String> sample_tags;    // Include at least one question with each of these tags.
   emp::vector<String> question_files;
   size_t generate_count = 0;          // How many questions should be generated? (0 = use all)
 
@@ -46,17 +47,19 @@ public:
       "Randomly generate questions (number as arg).");
     flags.AddOption('h', "--help",    [this](){ PrintHelp(); },
       "Provide usage information for QBL.");
-    flags.AddOption('i', "--include",     [this](String arg){include_tags.push_back(arg);},
-      "Select ALL questions with the following tag.");
+    flags.AddOption('i', "--include", [this](String arg){ include_tags.push_back(arg); },
+      "Include ALL questions with the following tag(s), not otherwise excluded.");
     flags.AddOption('l', "--latex",   [this](){ SetFormat(Format::LATEX); },
       "Set output to be Latex format.");
     flags.AddOption('o', "--output",  [this](String arg){ SetOutput(arg); },
       "Set output file name [arg].");
     flags.AddOption('q', "--qbl",     [this](){ SetFormat(Format::QBL); },
       "Set output to be QBL format.");
-    flags.AddOption('r', "--require", [this](String arg){require_tags.push_back(arg);},
-      "Only questions with the following tag can be included.");
-//    flags.AddOption('s', "--set",     [this](){},
+    flags.AddOption('r', "--require", [this](String arg){ require_tags.push_back(arg); },
+      "Only questions with the following tag(s) can be included.");
+    flags.AddOption('s', "--sample",  [this](String arg){ sample_tags.push_back(arg); },
+      "At least one question with the following tag(s) should be included.");
+//    flags.AddOption('S', "--set",     [this](){},
 //      "Run the following argument to set a value; e.g. `var=12`.");
     flags.AddOption('t', "--title", [this](String arg){ SetTitle(arg); },
       "Specify the quiz title to use in the generated file.");
@@ -65,7 +68,7 @@ public:
     flags.AddOption('w', "--web",     [this](){ SetFormat(Format::WEB); },
       "Set output to HTML/CSS/JS format.");
     flags.AddOption('x', "--exclude", [this](String arg){exclude_tags.push_back(arg);},
-      "Remove all questions with following tag; overrides `-i`.");
+      "Exclude all questions with following tag(s).");
 
     flags.Process();
     question_files = flags.GetExtras();
@@ -144,7 +147,9 @@ public:
 
   void Generate() {
     qbank.Validate();
-    if (generate_count) qbank.Generate(generate_count, include_tags, exclude_tags, require_tags);
+    if (generate_count) {
+      qbank.Generate(generate_count, include_tags, exclude_tags, require_tags, sample_tags);
+    }
   }
 
   void Print(Format out_format, std::ostream & os=std::cout) const {
@@ -280,6 +285,7 @@ public:
       << "Include tags: " << emp::MakeLiteral(include_tags) << "\n"
       << "Exclude tags: " << emp::MakeLiteral(exclude_tags) << "\n"
       << "Required tags: " << emp::MakeLiteral(require_tags) << "\n"
+      << "Sampled tags: " << emp::MakeLiteral(sample_tags) << "\n"
       << "----------\n";
     qbank.PrintDebug(os);
   }
