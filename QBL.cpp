@@ -37,6 +37,9 @@ private:
   emp::vector<String> question_files;
   size_t generate_count = 0;          // How many questions should be generated? (0 = use all)
 
+  // Helper functions
+  void _AddTags(emp::vector<String> & tags, const String & arg) { emp::Append(tags, arg.Slice()); }
+
 public:
   QBL(int argc, char * argv[]) : flags(argc, argv) {
     flags.AddOption('d', "--d2l",     [this](){ SetFormat(Format::D2L); },
@@ -47,7 +50,7 @@ public:
       "Randomly generate questions (number as arg).");
     flags.AddOption('h', "--help",    [this](){ PrintHelp(); },
       "Provide usage information for QBL.");
-    flags.AddOption('i', "--include", [this](String arg){ include_tags.push_back(arg); },
+    flags.AddOption('i', "--include", [this](String arg){ _AddTags(include_tags, arg); },
       "Include ALL questions with the following tag(s), not otherwise excluded.");
     flags.AddOption('l', "--latex",   [this](){ SetFormat(Format::LATEX); },
       "Set output to be Latex format.");
@@ -55,9 +58,9 @@ public:
       "Set output file name [arg].");
     flags.AddOption('q', "--qbl",     [this](){ SetFormat(Format::QBL); },
       "Set output to be QBL format.");
-    flags.AddOption('r', "--require", [this](String arg){ require_tags.push_back(arg); },
+    flags.AddOption('r', "--require", [this](String arg){ _AddTags(require_tags, arg); },
       "Only questions with the following tag(s) can be included.");
-    flags.AddOption('s', "--sample",  [this](String arg){ sample_tags.push_back(arg); },
+    flags.AddOption('s', "--sample",  [this](String arg){ _AddTags(sample_tags, arg); },
       "At least one question with the following tag(s) should be included.");
 //    flags.AddOption('S', "--set",     [this](){},
 //      "Run the following argument to set a value; e.g. `var=12`.");
@@ -67,7 +70,7 @@ public:
       "Provide QBL version information.");
     flags.AddOption('w', "--web",     [this](){ SetFormat(Format::WEB); },
       "Set output to HTML/CSS/JS format.");
-    flags.AddOption('x', "--exclude", [this](String arg){exclude_tags.push_back(arg);},
+    flags.AddOption('x', "--exclude", [this](String arg){ _AddTags(exclude_tags, arg); },
       "Exclude all questions with following tag(s).");
 
     flags.Process();
