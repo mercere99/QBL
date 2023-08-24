@@ -108,7 +108,7 @@ public:
   }
 
   // Scan through all of the questions and remove those that either have an excluded tag or don't have a required tag.
-  void Generate_RemoveExcluded(const tag_set_t & exclude_tags, const tag_set_t & require_tags) {
+  void Generate_DoExcludes(const tag_set_t & exclude_tags, const tag_set_t & require_tags) {
     for (size_t i = 0; i < questions.size(); ++i) {
       for (const auto & tag : exclude_tags) {
         if (questions[i].HasTag(tag)) Generate_ExcludeQuestion(i, "has exclude tag");
@@ -120,12 +120,38 @@ public:
   }
 
   // Scan through all of the questions and included the ones we are required to.
-  void Generate_IncludeRequired(const tag_set_t & include_tags) {
+  void Generate_DoIncludes(const tag_set_t & include_tags) {
+    // Handle include tags.
     for (size_t i = 0; i < questions.size(); ++i) {
-      if (questions[i].IsRequired()) Generate_IncludeQuestion(i, "required");
+      if (questions[i].IsRequired()) Generate_IncludeQuestion(i, "marked required");
       for (const auto & tag : include_tags) {
         if (questions[i].HasTag(tag)) Generate_IncludeQuestion(i, "has include tag");
       }
+    }
+  }
+
+  void Generate_DoSamples(emp::Random & random, const tag_set_t & sample_tags) {
+    for (const String & tag : sample_tags) {
+      emp::vector<size_t> tag_ids; // Question IDs to choose from with this tag.
+      bool sampled = false;
+      for (size_t id=0; id < questions.size(); ++id) {
+        // Skip questions that don't have the tag or are already excluded.
+        if (!questions[id].HasTag(tag) || q_status[id] == QStatus::EXCLUDED) continue;
+
+        // If a question with the tag is already included, we are done!
+        if (q_status[id] == QStatus::INCLUDED) { sampled=true; break; }
+
+        tag_ids.push_back(id); // Track this question as one to possibly add.
+      }
+      if (sampled) continue;
+
+      if (tag_ids.size() == 0) {
+        emp::notify::Warning("Unable to find sample for tag '", tag, "'.");
+        continue;
+      }
+
+      size_t sample_id = emp::SelectRandom(random, tag_ids);
+      Generate_IncludeQuestion(sample_id, "sampled for tag");
     }
   }
 
@@ -137,7 +163,8 @@ public:
   }
 
   void Generate(size_t count, emp::Random & random, const tag_set_t & include_tags,
-                const tag_set_t & exclude_tags, const tag_set_t & require_tags) {
+                const tag_set_t & exclude_tags, const tag_set_t & require_tags,
+                const tag_set_t & sample_tags) {
     emp::notify::TestError(count > questions.size(), "Requesting more questions (", count,
       ") than available in Question Bank (", questions.size(), ")");
 
@@ -146,10 +173,12 @@ public:
     include_count = 0;
     exclude_count = 0;
 
-    Generate_RemoveExcluded(exclude_tags, require_tags);
-    Generate_IncludeRequired(include_tags);
+    Generate_DoExcludes(exclude_tags, require_tags);
+    Generate_DoIncludes(include_tags);
+    Generate_DoSamples(random, sample_tags);
 
-    // Pick them randomly from here; loop as long as we need questions and there are some left.
+    // Pick them randomly from here to fill in the rest;
+    // loop as long as we need questions and there are some left.
     while (include_count < count && include_count + exclude_count < questions.size()) {
       size_t pick = random.GetUInt(questions.size());
       if (q_status[pick] != QStatus::UNKNOWN) continue;
@@ -170,9 +199,10 @@ public:
   }
 
   void Generate(size_t count, const tag_set_t & include_tags,
-                const tag_set_t & exclude_tags, const tag_set_t & require_tags) {
+                const tag_set_t & exclude_tags, const tag_set_t & require_tags,
+                const tag_set_t & sample_tags) {
     emp::Random random;
-    Generate(count, random, include_tags, exclude_tags, require_tags);
+    Generate(count, random, include_tags, exclude_tags, require_tags, sample_tags);
   }
 
   void Print(std::ostream & os=std::cout) const {
