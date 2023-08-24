@@ -27,11 +27,12 @@ private:
   };
 
   Format format = Format::NONE;       // No format set yet.
-  String base_filename = "";          // Output filename; empty=no file; "_interact_"=interactive
-  String extension = "";              // Provided extension to use for output file. 
-  emp::vector<String> include_tags;   // Questions with tags should all be included.
-  emp::vector<String> exclude_tags;   // Questions with these tags should all be excluded.
-  emp::vector<String> require_tags;   // Only questions with these tags should be included.
+  String base_filename = "";          // Output filename; empty=no file
+  String extension = "";              // Provided extension to use for output file.
+  String title = "Multiple Choice Quiz"; // Title to use in any generated files.
+  emp::vector<String> include_tags;   // Include ALL questions with these tags.
+  emp::vector<String> exclude_tags;   // Exclude ALL questions with these tags (override includes)
+  emp::vector<String> require_tags;   // ONLY questions with these tags can be included.
   emp::vector<String> question_files;
   size_t generate_count = 0;          // How many questions should be generated? (0 = use all)
 
@@ -45,8 +46,8 @@ public:
       "Randomly generate questions (number as arg).");
     flags.AddOption('h', "--help",    [this](){ PrintHelp(); },
       "Provide usage information for QBL.");
-    flags.AddOption('i', "--interact",[this](){ SetOutput("_interact_"); },
-      "Set output to be interactive (command line).");
+    flags.AddOption('i', "--include",     [this](String arg){include_tags.push_back(arg);},
+      "Select ALL questions with the following tag.");
     flags.AddOption('l', "--latex",   [this](){ SetFormat(Format::LATEX); },
       "Set output to be Latex format.");
     flags.AddOption('o', "--output",  [this](String arg){ SetOutput(arg); },
@@ -54,21 +55,23 @@ public:
     flags.AddOption('q', "--qbl",     [this](){ SetFormat(Format::QBL); },
       "Set output to be QBL format.");
     flags.AddOption('r', "--require", [this](String arg){require_tags.push_back(arg);},
-      "Set output to be QBL format.");
+      "Only questions with the following tag can be included.");
 //    flags.AddOption('s', "--set",     [this](){},
 //      "Run the following argument to set a value; e.g. `var=12`.");
-    flags.AddOption('t', "--tag",     [this](String arg){include_tags.push_back(arg);},
-      "Select only those questions with the following tag.");
+    flags.AddOption('t', "--title", [this](String arg){ SetTitle(arg); },
+      "Specify the quiz title to use in the generated file.");
     flags.AddOption('v', "--version", [this](){ PrintVersion(); },
       "Provide QBL version information.");
     flags.AddOption('w', "--web",     [this](){ SetFormat(Format::WEB); },
       "Set output to HTML/CSS/JS format.");
     flags.AddOption('x', "--exclude", [this](String arg){exclude_tags.push_back(arg);},
-      "Remove all questions with following tag; overrides `-t`.");
+      "Remove all questions with following tag; overrides `-i`.");
 
     flags.Process();
     question_files = flags.GetExtras();
   }
+
+  void SetTitle(const String & in) { title = in; }
 
   void SetFormat(Format f) {
     emp::notify::TestWarning(format != Format::NONE,
@@ -176,13 +179,13 @@ public:
     << "<head>\n"
     << "  <meta charset=\"UTF-8\">\n"
     << "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n"
-    << "  <title>Multiple Choice Quiz</title>\n"
+    << "  <title>" << title << "</title>\n"
     << "  <link rel=\"stylesheet\" href=\"" << base_filename << ".css\">\n"
     << "</head>\n"
     << "<body>\n"
     << "\n"
     << "<form id=\"quizForm\">\n"
-    << "  <h1>Multiple Choice Quiz</h1>\n"
+    << "  <h1>" << title << "</h1>\n"
     << "\n";
 
     qbank.PrintHTML(html_out);
