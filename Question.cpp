@@ -41,13 +41,14 @@ void Question::PrintHTML(std::ostream & os) const {
        << "\" value=\"opt" << opt_id << "\">"
        << TextToHTML(options[opt_id].text) << "</label>\n";
   }
-  os << "</div>\n";
-  os << std::endl; // Skip a line.
+  os << "  <div class=\"answer\" data-question=\"q" << id << "\"></div> <!-- Placeholder for answer -->"
+     << "</div>\n"
+     << std::endl; // Skip a line.
 }
 
 void Question::PrintJS(std::ostream & os) const {
   emp::notify::TestWarning(CountCorrect() != 1,
-    "HTML mode expects exactly one correct answer per question; ", CountCorrect(), " found.");
+    "Web mode expects exactly one correct answer per question; ", CountCorrect(), " found.");
   os << "    q" << id << ": \"opt" << FindCorrectID() << "\",\n"
      << std::endl;
 }
