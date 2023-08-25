@@ -190,7 +190,7 @@ public:
 
   void Print(std::ostream & os=std::cout) const;
   void PrintD2L(std::ostream & os=std::cout) const;
-  void PrintHTML(std::ostream & os=std::cout) const;
+  void PrintHTML(std::ostream & os=std::cout, size_t q_num=0) const;
   void PrintJS(std::ostream & os=std::cout) const;
   void PrintLatex(std::ostream & os=std::cout) const;
 

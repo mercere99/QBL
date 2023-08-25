@@ -219,7 +219,7 @@ public:
 
   void PrintHTML(std::ostream & os=std::cout) const {
     for (size_t id = 0; id < questions.size(); ++id) {
-      questions[id].PrintHTML(os);
+      questions[id].PrintHTML(os, id+1);
     }
   }
 
