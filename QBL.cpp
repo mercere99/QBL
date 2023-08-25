@@ -218,6 +218,24 @@ public:
     // Print Footer for the JS file.
     js_out
     << "  };\n"
+
+    << "// Fetch all the radio buttons in the quiz\n"
+    << "let radioButtons = document.querySelectorAll('input[type=\"radio\"]');\n"
+    << "\n"
+    << "// Add a click event to each radio button\n"
+    << "radioButtons.forEach(button => {\n"
+    << "    button.addEventListener('click', clearResults);\n"
+    << "});\n"
+    << "\n"
+    << "function clearResults() {\n"
+    << "    // Clear main results\n"
+    << "    document.getElementById('results').innerHTML = '';\n"
+    << "\n"
+    << "    // Clear answers displayed beneath each question\n"
+    << "    let answerDivs = document.querySelectorAll('.answer');\n"
+    << "    answerDivs.forEach(div => div.innerHTML = \"\");\n"
+    << "}\n"
+
     << "\n"
     << "  let userAnswers = {};\n"
     << "  for (let key in correctAnswers) {\n"
