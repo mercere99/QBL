@@ -31,17 +31,22 @@ void Question::PrintD2L(std::ostream & os) const {
     << ",,,,\n";
 }
 
-void Question::PrintHTML(std::ostream & os) const {
-  os
-  << "  <!-- Question " << id << " -->\n"
-  << "  <div class=\"question\">\n"
-  << "    <p>" << id << ". " << TextToHTML(question) <<  "</p>\n";
+void Question::PrintHTML(std::ostream & os, size_t q_num) const {
+  os << "  <!-- Question " << id << " -->\n"
+     << "  <div class=\"question\">\n"
+     << "    <p>";
+  if (q_num) os << q_num << ". ";  // If we were given a number > 0, print it.
+  os << TextToHTML(question) <<  "</p>\n";
+
+  // Print options.
   for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
     os << "    <label><input type=\"radio\" name=\"q" << id
        << "\" value=\"" << _OptionLabel(opt_id) << "\">"
        << _OptionLabel(opt_id) << " "
        << TextToHTML(options[opt_id].text) << "</label>\n";
   }
+  
+  // Leave a div to place the answer.
   os << "  <div class=\"answer\" data-question=\"q" << id << "\"></div> <!-- Placeholder for answer -->"
      << "</div>\n"
      << std::endl; // Skip a line.
@@ -169,8 +174,14 @@ void Question::ShuffleOptions(emp::Random & random) {
 }
 
 void Question::Generate(emp::Random & random) {
-  // Collect config info for this question (that wasn't collected in Validate(), above)
-  // double alt_p = _GetConfig(":alt_prob", 0.5);
+  // Determine if we are going to toggle this question to its alternate form.
+  double alt_p = _GetConfig(":alt_prob", 0.5);
+  if (alt_question.size() && random.P(alt_p)) {
+    std::swap(question, alt_question);
+    for (auto & opt : options) {
+      opt.is_correct = !opt.is_correct;
+    }
+  }
 
   size_t correct_target = random.GetUInt(correct_range.GetLower(), correct_range.GetUpper()+1);
   option_range.LimitLower(correct_target);
