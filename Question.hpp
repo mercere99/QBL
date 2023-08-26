@@ -36,6 +36,7 @@ private:
 
   emp::String question;                  ///< Main wording for this questions.
   emp::String alt_question;              ///< Toggled wording for this question.
+  emp::String explanation;               ///< Add an explanation for this question.
   emp::vector<Option> options;
   size_t id = (size_t) -1;
   emp::String hint;
@@ -56,6 +57,7 @@ private:
     NONE=0,
     QUESTION,
     ALT_QUESTION,
+    EXPLANATION,
     OPTIONS
   };
   Section last_edit = Section::NONE;
@@ -142,6 +144,9 @@ public:
     case Section::ALT_QUESTION:
       alt_question.Append('\n', line);
       break;
+    case Section::EXPLANATION:
+      explanation.Append('\n', line);
+      break;
     case Section::OPTIONS:      
       options.back().text.Append('\n', line);
     }
@@ -150,6 +155,11 @@ public:
   void AddAltQuestion(const emp::String & line) {
     alt_question = line;
     last_edit = Section::ALT_QUESTION;    
+  }
+
+  void AddExplanation(const emp::String & line) {
+    explanation = line;
+    last_edit = Section::EXPLANATION;
   }
 
   void AddOption(emp::String tag, const emp::String & option) {
