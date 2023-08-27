@@ -55,8 +55,7 @@ void Question::PrintHTML(std::ostream & os, size_t q_num) const {
 void Question::PrintJS(std::ostream & os) const {
   emp::notify::TestWarning(CountCorrect() != 1,
     "Web mode expects exactly one correct answer per question; ", CountCorrect(), " found.");
-  os << "    q" << id << ": \"" << _OptionLabel(FindCorrectID()) << "\",\n"
-     << std::endl;
+  os << "    q" << id << ": \"" << _OptionLabel(FindCorrectID()) << "\",\n";
 }
 
 void Question::PrintLatex(std::ostream & os) const {
