@@ -34,16 +34,16 @@ void Question::PrintD2L(std::ostream & os) const {
 void Question::PrintHTML(std::ostream & os, size_t q_num) const {
   os << "  <!-- Question " << id << " -->\n"
      << "  <div class=\"question\">\n"
-     << "    <p>";
-  if (q_num) os << q_num << ". ";  // If we were given a number > 0, print it.
+     << "    <p><b>";
+  if (q_num) os << q_num << ".</b> ";  // If we were given a number > 0, print it.
   os << TextToHTML(question) <<  "</p>\n";
 
   // Print options.
   for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
-    os << "    <label><input type=\"radio\" name=\"q" << id
+    os << "    <div class=\"options\"><label><input type=\"radio\" name=\"q" << id
        << "\" value=\"" << _OptionLabel(opt_id) << "\">"
        << _OptionLabel(opt_id) << " "
-       << TextToHTML(options[opt_id].text) << "</label>\n";
+       << TextToHTML(options[opt_id].text) << "</label></div>\n";
   }
   
   // Leave a div to place the answer.
