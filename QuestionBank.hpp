@@ -200,8 +200,8 @@ public:
 
   void Generate(size_t count, const tag_set_t & include_tags,
                 const tag_set_t & exclude_tags, const tag_set_t & require_tags,
-                const tag_set_t & sample_tags) {
-    emp::Random random;
+                const tag_set_t & sample_tags, int random_seed=-1) {
+    emp::Random random(random_seed);
     Generate(count, random, include_tags, exclude_tags, require_tags, sample_tags);
   }
 
