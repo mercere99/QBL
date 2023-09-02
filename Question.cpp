@@ -114,9 +114,9 @@ void Question::Validate() {
   const size_t incorrect_count = options.size() - correct_count;
   const size_t max_options = incorrect_count + correct_range.Upper();
   emp::notify::TestError(max_options < option_range.Lower(),
-    "Question ", id, " has a max of ", MakeCount(correct_range.Upper(), "correct answer"), " and ",
+    "Question ", id, " (", question, ")", " has a max of ", MakeCount(correct_range.Upper(), "correct answer"), " and ",
     MakeCount(incorrect_count, "other option"), ", but requires at least ", option_range.Lower(),
-    "options.");
+    " options.");
   option_range.LimitUpper(max_options);     // Must at least select required options.
 
   // Make sure that all fixed-order options are at the beginning or end.
