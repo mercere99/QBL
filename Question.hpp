@@ -97,6 +97,15 @@ private:
     return emp::MakeString('(', static_cast<char>('A'+id), ')');
   }
 
+  template <typename... Ts>
+  bool _TestError(bool test, Ts &&... args) {
+    if (test) {
+      emp::notify::Error("Question ", id, " (", question, ")", ": ",
+                         std::forward<Ts>(args)...);
+    }
+    return test;
+  }
+
 public:
   Question() { }
   Question(size_t _id) : id(_id) { }
