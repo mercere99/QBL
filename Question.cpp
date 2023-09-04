@@ -91,30 +91,30 @@ void Question::Validate() {
 
   // Are there enough correct answers?
   const size_t correct_count = CountCorrect();
-  emp::notify::TestError(correct_count < correct_range.GetLower(),
-    "Question ", id, " has ", MakeCount(correct_count, "correct answer"), ", but ",
+  _TestError(correct_count < correct_range.GetLower(),
+    "Has ", MakeCount(correct_count, "correct answer"), ", but ",
      correct_range.GetLower(), " required.");
   correct_range.LimitUpper(correct_count);    // Cannot have more correct answers than available.
 
   // Are there too many REQUIRED correct answers?
   const size_t correct_req_count = CountRequiredCorrect();
-  emp::notify::TestError(correct_req_count > correct_range.GetUpper(),
-    "Question ", id, " has ", MakeCount(correct_req_count, "correct answer"), "marked required, but at most ",
+  _TestError(correct_req_count > correct_range.GetUpper(),
+    "Has ", MakeCount(correct_req_count, "correct answer"), "marked required, but at most ",
      correct_range.GetUpper(), " allowed.");
   correct_range.LimitLower(correct_req_count); // Cannot have few correct answers than required.
 
   // Are there more REQUIRED options than allowed options?
   const size_t required_count = CountRequired();
-  emp::notify::TestError(required_count > option_range.Upper(),
-    "Question ", id, " has ", MakeCount(required_count, "answer"), " marked required, but at most ",
+  _TestError(required_count > option_range.Upper(),
+    "Has ", MakeCount(required_count, "answer"), " marked required, but at most ",
      option_range.GetUpper(), " options allowed.");
   option_range.LimitLower(required_count);     // Must at least select required options.
 
   // Are there enough available options?
   const size_t incorrect_count = options.size() - correct_count;
   const size_t max_options = incorrect_count + correct_range.Upper();
-  emp::notify::TestError(max_options < option_range.Lower(),
-    "Question ", id, " (", question, ")", " has a max of ", MakeCount(correct_range.Upper(), "correct answer"), " and ",
+  _TestError(max_options < option_range.Lower(),
+    " Max of ", MakeCount(correct_range.Upper(), "correct answer"), " and ",
     MakeCount(incorrect_count, "other option"), ", but requires at least ", option_range.Lower(),
     " options.");
   option_range.LimitUpper(max_options);     // Must at least select required options.
@@ -124,8 +124,8 @@ void Question::Validate() {
   while (test_pos < options.size() && options[test_pos].is_fixed) test_pos++;  // Front fixed.
   while (test_pos < options.size() && !options[test_pos].is_fixed) test_pos++; // Middle NOT fixed.
   while (test_pos < options.size() && options[test_pos].is_fixed) test_pos++;  // Back fixed.
-  emp::notify::TestError(test_pos < options.size(),
-    "Question ", id, " has fixed-position options in middle; fixed positions must be at start and end.");
+  _TestError(test_pos < options.size(),
+    "Has fixed-position options in middle; fixed positions must be at start and end.");
 }
 
 void Question::ReduceOptions(emp::Random & random, size_t correct_target, size_t incorrect_target) {
