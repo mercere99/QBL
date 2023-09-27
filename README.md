@@ -16,21 +16,36 @@ exam.
 
 The following flags are also available:
 
-| Flag                 | Meaning                                                       |
-| -------------------- | ------------------------------------------------------------- |
-| `-d` or `--d2l`      | Output should be in D2L / Brightspace csv quiz upload format. |
-| `-g` or `--generate` | Specify the number of questions to randomly generate.         |
-| `-h` or `--help`     | Provide additional information for using QBL and stop.        |
-| `-i` or `--interact` | Output should be interactive on the command line.             |
-| `-l` or `--latex`    | (TO IMPLEMENT) Output should be in Latex format.                             |
-| `-o` or `--output`   | Next arg will be the name to use for the output file.         |
-| `-q` or `--qbl`      | Output should be in QBL format.                               |
-| `-r` or `--require`  | Require questions to have this tag for them to be included.   |
-| `-s` or `--set`      | (TO IMPLEMENT) Run the following argument to set a value; e.g. `var=12`. |
-| `-t` or `--tag`      | All questions with the provided tag must be included.         |
-| `-v` or `--version`  | Print out the current version of the software and stop.       |
-| `-w` or `--web`      | (TO IMPLEMENT) Output should be in HTML format.                              |
-| `-x` or `--exclude`  | Remove all questions with the provided tag; overrides `-t`.   |
+### General
+| Flag                 | Meaning                                                   | Example         |
+| -------------------- | --------------------------------------------------------- | --------------- |
+| `-g` or `--generate` | Specify the number of questions to randomly generate.     | `-g 20`         |
+| `-h` or `--help`     | Provide additional information for using QBL and stop.    | `-h`            |
+| `-o` or `--output`   | Next arg will be the name to use for the output file.     | `-o quiz1.html` |
+| `-S` or `--set`      | (TO IMPLEMENT) Run the following argument to set a value. | `-S var=12`     |
+| `-t` or `--title`    | Specify the title to use for the generated quiz.          | `-t "Quiz 1"`   |
+| `-v` or `--version`  | Print out the current version of the software and stop.   | `-v`            |
+
+### Output types
+| Flag                 | Meaning                                                   | Example         |
+| -------------------- | --------------------------------------------------------- | --------------- |
+| `-d` or `--d2l`      | Output to D2L / Brightspace csv quiz upload format.       | `-d`            |
+| `-l` or `--latex`    | (PARTIALLY IMPLEMENTED) Output to Latex format            | `-l`            |
+| `-q` or `--qbl`      | Output to QBL format.                                     | `-q`            |
+| `-w` or `--web`      | Output to HTML format.                                    | `-w`            |
+
+### Tag management
+| Flag                 | Meaning                                                   | Example              |
+| -------------------- | --------------------------------------------------------- | -------------------- |
+| `-i` or `--include`  | All questions with the provided tag(s) must be included.  | `-i prereq,basic`    |
+| `-r` or `--require`  | Exclude questions must that do not have any provided tag. | `-r cse101a,cse101b` |
+| `-s` or `--sample`   | Include at least one question with each provided tag.     | `-s topic1,topic2`   |
+| `-x` or `--exclude`  | Exclude all questions with the provided tag(s).           | `-x sample`          |
+
+Note: All exclusions occur _before_ any questions are included.  Thus if a question has both
+an include and exclude tag, exclusion takes priority.  Likewise if it is missing a required tag,
+it will always be excluded.  Multiple tags may be included if separated by commas (no spaces allowed)
+
 
 ## Question format
 
@@ -71,8 +86,8 @@ Specifically, the following line formats are available:
 | four spaces        | Pre-formatted code block.                                                    |
 | `-`                | Remove `-` and ignore other start format; allows blank lines in questions.   |
 | `+`                | Question should always be selected.                                          |
+| `!`                | Question is alternate option that negates all answer correctness. _Note:_ Make sure to have enough "correct" answers for this to work.    |
 | `>` (TO IMPLEMENT) | Question should be kept in the same position relative to other Qs.           |
-| `!` (TO IMPLEMENT) | Question is alternate option that negates all answer correctness.            |
 | `?` (TO IMPLEMENT) | Explanation about the previous line's Q or A (for post-exam learning)        |
 | `{` ... `}` (TO IMPLEMENT) | Mathematical equations for question setup.                           |
 | `=\|@&~;<,./`      | Not yet specified.                                                           |

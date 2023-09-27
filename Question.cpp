@@ -32,7 +32,32 @@ void Question::PrintD2L(std::ostream& os) const {
      << ",,,,\n";
 }
 
-void Question::PrintHTML(std::ostream& os) const { os << std::endl; }
+void Question::PrintHTML(std::ostream & os, size_t q_num) const {
+  os << "  <!-- Question " << id << " -->\n"
+     << "  <div class=\"question\">\n"
+     << "    <p><b>";
+  if (q_num) os << q_num << ".</b> ";  // If we were given a number > 0, print it.
+  os << TextToHTML(question) <<  "</p>\n";
+
+  // Print options.
+  for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
+    os << "    <div class=\"options\"><label><input type=\"radio\" name=\"q" << id
+       << "\" value=\"" << _OptionLabel(opt_id) << "\">"
+       << _OptionLabel(opt_id) << " "
+       << TextToHTML(options[opt_id].text) << "</label></div>\n";
+  }
+  
+  // Leave a div to place the answer.
+  os << "  <div class=\"answer\" data-question=\"q" << id << "\"></div> <!-- Placeholder for answer -->"
+     << "</div>\n"
+     << std::endl; // Skip a line.
+}
+
+void Question::PrintJS(std::ostream & os) const {
+  emp::notify::TestWarning(CountCorrect() != 1,
+    "Web mode expects exactly one correct answer per question; ", CountCorrect(), " found.");
+  os << "    q" << id << ": \"" << _OptionLabel(FindCorrectID()) << "\",\n";
+}
 
 void Question::PrintLatex(std::ostream& os) const {
   os << "% QUESTION " << id << "\n"
@@ -50,7 +75,7 @@ void Question::PrintLatex(std::ostream& os) const {
   os << std::endl;
 
   for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
-    os << " \\answer";
+    os << " QBL.cpp\\answer";
     if (options[opt_id].is_correct) os << "[correct]";
     os << " " << TextToLatex(options[opt_id].text) << '\n';
   }
@@ -60,9 +85,8 @@ void Question::PrintLatex(std::ostream& os) const {
 
 void Question::Validate() {
   // Collect config info for this question.
-  correct_range = GetConfig(":correct", emp::Range<size_t>(1, 1));
-  option_range =
-      GetConfig(":options", emp::Range<size_t>(options.size(), options.size()));
+  correct_range = _GetConfig(":correct", emp::Range<size_t>(1,1));
+  option_range = _GetConfig(":options", emp::Range<size_t>(options.size(),options.size()));
 
   // Are there enough correct answers?
   const size_t correct_count = CountCorrect();
@@ -161,9 +185,15 @@ void Question::ShuffleOptions(emp::Random& random) {
   emp::ShuffleRange(random, options, first_id, last_id);
 }
 
-void Question::Generate(emp::Random& random) {
-  // Collect config info for this question (that wasn't collected in Validate(),
-  // above) double alt_p = GetConfig(":alt_prob", 0.5);
+void Question::Generate(emp::Random & random) {
+  // Determine if we are going to toggle this question to its alternate form.
+  double alt_p = _GetConfig(":alt_prob", 0.5);
+  if (alt_question.size() && random.P(alt_p)) {
+    std::swap(question, alt_question);
+    for (auto & opt : options) {
+      opt.is_correct = !opt.is_correct;
+    }
+  }
 
   size_t correct_target =
       random.GetUInt(correct_range.GetLower(), correct_range.GetUpper() + 1);
