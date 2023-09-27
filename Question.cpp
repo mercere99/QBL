@@ -15,12 +15,12 @@ void Question::Print(std::ostream& os) const {
 
 void Question::PrintD2L(std::ostream& os) const {
   os << "NewQuestion,MC,,,\n"
-     << "ID,CSE232-" << id << ",,,\n"
-     << "Title,,,,\n"
-     << "QuestionText," << TextToD2L(question) << ",HTML,,\n"
-     << "Points,2,,,\n"
-     << "Difficulty,1,,,\n"
-     << "Image,,,,\n";
+    << "ID,QBL-" << id << ",,,\n"
+    << "Title,,,,\n"
+    << "QuestionText," << TextToD2L(question) << ",HTML,,\n"
+    << "Points,5,,,\n"
+    << "Difficulty,1,,,\n"
+    << "Image,,,,\n";
   for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
     os << "Option," << (options[opt_id].is_correct ? 100 : 0) << ","
        << TextToD2L(options[opt_id].text) << ",HTML,"
