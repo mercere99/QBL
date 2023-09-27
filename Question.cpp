@@ -75,7 +75,7 @@ void Question::PrintLatex(std::ostream& os) const {
   os << std::endl;
 
   for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
-    os << " QBL.cpp\\answer";
+    os << "\\answer";
     if (options[opt_id].is_correct) os << "[correct]";
     os << " " << TextToLatex(options[opt_id].text) << '\n';
   }
