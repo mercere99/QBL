@@ -12,12 +12,36 @@ static inline emp::String LineToD2L(emp::String line) {
   bool in_codeblock = line.HasPrefix("    ");
   bool in_code = in_codeblock;
 
+  // Everything between backslash \& and ; or \< to > make literal
+  char scan_to = '\0';
+  bool start_scan = false;
+
   if (in_codeblock) {
     line.PopFixed(4);
     out_line += "&nbsp;&nbsp;<code>";
   }
 
   for (char c : line) {
+    if (scan_to) {
+      out_line += c;
+      if (scan_to == c) scan_to = '\0';
+      continue;
+    }
+
+    if (start_scan) {
+      switch (c) {
+      case '&': out_line += c; scan_to = ';'; break;
+      case '<': out_line += c; scan_to = '>'; break;
+      case '\\': out_line += c; break;
+      case '\n': out_line += "<br>"; break;
+      default:
+        std::cerr << "Error: Unknown escape character.\n" << std::endl;
+        exit(1);
+      }
+      start_scan = false;
+      continue;
+    }
+
     switch (c) {
       case '\"': out_line += "&quot;"; break;
       case ' ': out_line += in_code ? "&nbsp;" : " ";  break;
@@ -25,6 +49,7 @@ static inline emp::String LineToD2L(emp::String line) {
       case '<': out_line += in_code ? "&lt;" : "<"; break;  // Outside code might be HTML
       case '>': out_line += in_code ? "&gt;" : ">"; break;  // Outside code might be HTML
       case '&': out_line += in_code ? "&amp;" : "&"; break;  // Outside code might be HTML
+      case '\\': start_scan = true; break;
 
       // Replace ` with <code> or </code>
       case '`':
@@ -108,6 +133,10 @@ static inline emp::String LineToHTML(emp::String line) {
   bool in_codeblock = line.HasPrefix("    ");
   bool in_code = in_codeblock;
 
+  // Everything between backslash \& and ; or \< to > make literal
+  char scan_to = '\0';
+  bool start_scan = false;
+
   if (in_codeblock) {
     line.PopFixed(4);
     out_line += "&nbsp;&nbsp;<code>";
@@ -121,12 +150,33 @@ static inline emp::String LineToHTML(emp::String line) {
   }
 
   for (char c : line) {
+    if (scan_to) {  // Do we need to literally translate?
+      out_line += c;
+      if (scan_to == c) scan_to = '\0';
+      continue;
+    }
+
+    if (start_scan) {
+      switch (c) {
+      case '&': out_line += c; scan_to = ';'; break;
+      case '<': out_line += c; scan_to = '>'; break;
+      case '\\': out_line += c; break;
+      case '\n': out_line += "<br>"; break;
+      default:
+        std::cerr << "Error: Unknown escape character.\n" << std::endl;
+        exit(1);
+      }
+      start_scan = false;
+      continue;
+    }
+
     switch (c) {
       case '&': out_line += "&amp;";  break;
       case '<': out_line += "&lt;"; break;
       case '>': out_line += "&gt;"; break;
       case '\'': out_line += "&apos;"; break;
       case '"': out_line += "&quot;"; break;
+      case '\\': start_scan = true; break;
 
       // Replace ` with \texttt{ or }
       case '`':
