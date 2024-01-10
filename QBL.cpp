@@ -37,6 +37,7 @@ private:
   emp::vector<String> sample_tags;    // Include at least one question with each of these tags.
   emp::vector<String> question_files;
   size_t generate_count = 0;          // How many questions should be generated? (0 = use all)
+  int random_seed = -1;               // Random seed for generating questions (-1 = use time)
 
   // Helper functions
   void _AddTags(emp::vector<String> & tags, const String & arg) { emp::Append(tags, arg.Slice()); }
@@ -61,6 +62,8 @@ public:
       "Set output to be QBL format.");
     flags.AddOption('r', "--require", [this](String arg){ _AddTags(require_tags, arg); },
       "Only questions with the following tag(s) can be included.");
+    flags.AddOption('R', "--random", [this](String arg){ SetRandomSeed(arg); },
+      "Set the random seed");
     flags.AddOption('s', "--sample",  [this](String arg){ _AddTags(sample_tags, arg); },
       "At least one question with the following tag(s) should be included.");
 //    flags.AddOption('S', "--set",     [this](){},
@@ -119,6 +122,11 @@ public:
     }
     generate_count = _count.As<size_t>();
   }
+  
+  void SetRandomSeed(String _seed) {
+    random_seed = _seed.As<int>();
+    std::cout << "Using random seed: " << random_seed << std::endl;
+  }
 
   void PrintVersion() const {
     std::cout << "QBL (Question Bank Language) version " QBL_VERSION << std::endl;
@@ -160,7 +168,8 @@ public:
   void Generate() {
     qbank.Validate();
     if (generate_count) {
-      qbank.Generate(generate_count, include_tags, exclude_tags, require_tags, sample_tags);
+      qbank.Generate(generate_count, include_tags, exclude_tags, 
+          require_tags, sample_tags, random_seed);
     }
   }
 
