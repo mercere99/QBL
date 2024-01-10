@@ -27,6 +27,7 @@ private:
   };
 
   Format format = Format::NONE;       // No format set yet.
+  String base_path = "";              // Where are we placing these files?
   String base_filename = "";          // Output filename; empty=no file
   String extension = "";              // Provided extension to use for output file.
   String title = "Multiple Choice Quiz"; // Title to use in any generated files.
@@ -92,7 +93,15 @@ public:
       exit(1);
     }
     std::cout << "Directing output to file '" << _filename << "'." << std::endl;
-    size_t dot_pos = _filename.RFind('.');      
+    size_t slash_pos = _filename.RFind('/');
+    if (slash_pos != emp::String::npos) {
+      if (slash_pos+1 == _filename.size()) {
+        emp::notify::Error("Must provide a filename (not directory) for output.");
+        exit(1);
+      }
+      base_path = _filename.PopFixed(slash_pos+1);
+    }
+    size_t dot_pos = _filename.RFind('.');
     base_filename = _filename.substr(0, dot_pos);
     extension = _filename.View(dot_pos);
     // If we don't have a format yet, set it based on the filename.
@@ -170,10 +179,10 @@ public:
     // If there is no filename, just print to standard out.
     if (!base_filename.size()) { Print(format); return; }
 
-    std::ofstream main_file(base_filename + extension);
+    std::ofstream main_file(base_path + base_filename + extension);
     if (format == Format::WEB) {
-      std::ofstream js_file(base_filename + ".js");
-      std::ofstream css_file(base_filename + ".css");
+      std::ofstream js_file(base_path + base_filename + ".js");
+      std::ofstream css_file(base_path + base_filename + ".css");
       PrintWeb(main_file, js_file, css_file);
     }
     else Print(format, main_file);
