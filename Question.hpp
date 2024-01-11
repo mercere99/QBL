@@ -34,20 +34,20 @@ private:
     }
   };
 
-  emp::String question;                  ///< Main wording for this questions.
-  emp::String alt_question;              ///< Toggled wording for this question.
-  emp::String explanation;               ///< Add an explanation for this question.
-  emp::vector<Option> options;
-  size_t id = (size_t) -1;
-  emp::String hint;
-  emp::String feedback;
+  emp::String question;         ///< Main wording for this questions.
+  emp::String alt_question;     ///< Toggled wording for this question.
+  emp::String explanation;      ///< Add an explanation for this question.
+  emp::vector<Option> options;  ///< Set of all possible options for answers.
+  size_t id = (size_t) -1;      ///< Unique ID for this question.
+  emp::String hint;             ///< Hint to point students in the right direction.
+  emp::String feedback;         ///< Feedback to go along with answer results.
 
   emp::vector<String> base_tags;
   emp::vector<String> exclusive_tags;
   std::map<String,String> config_tags;
 
-  bool is_required = false;
-  bool is_fixed = false;
+  bool is_required = false;   ///< Must this question be used on a generated quiz?
+  bool is_fixed = false;      ///< Is this question locked into this order?
 
   // Internal tracking
   emp::Range<size_t> correct_range;
@@ -108,9 +108,9 @@ private:
 
 public:
   Question() { }
-  Question(size_t _id) : id(_id) { }
-  Question(const Question &) = default;
-  Question(Question &&) = default;
+  Question(size_t id) : id(id) { }       ///< Constructor that specified ID.
+  Question(const Question &) = default;  ///< Copy Constructor
+  Question(Question &&) = default;       ///< Move Constructor
 
   Question & operator=(const Question &) = default;
   Question & operator=(Question &&) = default;
