@@ -17,42 +17,21 @@
 using emp::String;
 
 class Question {
-private:
-  struct Option {
-    String text;       ///< Wording for this option.
-    bool is_correct;   ///< Is this option marked as a correct answer?
-    bool is_fixed;     ///< Is this option in a fixed position?
-    bool is_required;  ///< Does this option have to be included?
-    String feedback;   ///< Feedback for a student picking this option.
-
-    String GetQBLBullet() const {
-      String out("*");
-      if (is_required) out += '+';
-      if (is_fixed) out += '>';
-      if (is_correct) out.Set('[', out, ']');
-      return out;
-    }
-  };
-
-  emp::String question;         ///< Main wording for this questions.
-  emp::String alt_question;     ///< Toggled wording for this question.
-  emp::String explanation;      ///< Add an explanation for this question.
-  emp::vector<Option> options;  ///< Set of all possible options for answers.
+protected:
   size_t id = (size_t) -1;      ///< Unique ID for this question.
+  emp::String question;         ///< Wording for this question.
+  emp::String alt_question;     ///< Toggled wording for this question.
+  emp::String explanation;      ///< Explain this question to the student (usually reveals answer)
   emp::String hint;             ///< Hint to point students in the right direction.
-  emp::String feedback;         ///< Feedback to go along with answer results.
 
-  emp::vector<String> base_tags;
-  emp::vector<String> exclusive_tags;
-  std::map<String,String> config_tags;
+  emp::vector<String> base_tags;       ///< Tags to identify topic.
+  emp::vector<String> exclusive_tags;  ///< Tags for question groups where only one should be used.
+  std::map<String,String> config_tags; ///< Tags to specify question details (num options, etc)
 
   bool is_required = false;   ///< Must this question be used on a generated quiz?
   bool is_fixed = false;      ///< Is this question locked into this order?
 
-  // Internal tracking
-  emp::Range<size_t> correct_range;
-  emp::Range<size_t> option_range;
-
+  // Which section are we currently loading in?  Needed for multi-line entries.
   enum class Section {
     NONE=0,
     QUESTION,
@@ -62,15 +41,6 @@ private:
   };
   Section last_edit = Section::NONE;
 
-  // Helper functions
-
-  template <typename T>
-  static emp::Range<T> _StringToRange(String val) {
-    T val1 = val.Pop("-").As<T>();               // Respect a dash if there is one.
-    T val2 = val.size() ? val.As<T>() : val1;
-    return emp::MakeRange(val1, val2);
-  }
-
   template <typename T>
   T _GetConfig(String name, T default_val=T{}) {
     if (!emp::Has(config_tags, name)) return default_val;
@@ -78,23 +48,14 @@ private:
 
     // Ranges should allow a dash.
     if constexpr (std::is_same_v<T,emp::Range<size_t>>) {
-      return _StringToRange<size_t>(val);
+      return emp::MakeRange<size_t>(val);
     }
     else if constexpr (std::is_same_v<T,emp::Range<double>>) {
-      return _StringToRange<double>(val);
+      return emp::MakeRange<double>(val);
     }
     else {
       return val.As<T>();
     }
-  }
-
-  template <typename FUN_T>
-  size_t _Count(FUN_T fun) const {
-    return std::count_if(options.begin(), options.end(), fun);
-  }
-
-  String _OptionLabel(size_t id) const {
-    return emp::MakeString('(', static_cast<char>('A'+id), ')');
   }
 
   template <typename... Ts>
@@ -111,6 +72,7 @@ public:
   Question(size_t id) : id(id) { }       ///< Constructor that specified ID.
   Question(const Question &) = default;  ///< Copy Constructor
   Question(Question &&) = default;       ///< Move Constructor
+  virtual ~Question() { }
 
   Question & operator=(const Question &) = default;
   Question & operator=(Question &&) = default;
@@ -120,22 +82,6 @@ public:
 
   void SetFixed() { is_fixed = true; }
   void SetRequired() { is_required = true; }
-
-  size_t CountCorrect() const { return _Count([](const Option & o){ return o.is_correct; }); }
-  size_t CountIncorrect() const { return _Count([](const Option & o){ return !o.is_correct; }); }
-  size_t CountRequired() const { return _Count([](const Option & o){ return o.is_required; }); }
-  size_t CountRequiredCorrect() const
-    { return _Count([](const Option & o){ return o.is_correct && o.is_required; }); }
-  size_t CountFixed() const { return _Count([](const Option & o){ return o.is_fixed; }); }
-
-  size_t FindCorrectID(size_t start=0) const {
-    for (size_t i = start; i < options.size(); ++i) {
-      if (options[i].is_correct) return i;
-    }
-    return static_cast<size_t>(-1);
-  }
-
-  bool HasFixedLast() const { return options.size() && options.back().is_fixed; }
 
   void AddText(const emp::String & line) {
     // Text with a start symbol would have been directed elsewhere.  Regular text is either a
@@ -156,8 +102,8 @@ public:
     case Section::EXPLANATION:
       explanation.Append('\n', line);
       break;
-    case Section::OPTIONS:      
-      options.back().text.Append('\n', line);
+    case Section::OPTIONS:
+      AddOption(line);
     }
   }
 
@@ -170,17 +116,6 @@ public:
     explanation = line;
     last_edit = Section::EXPLANATION;
   }
-
-  void AddOption(emp::String tag, const emp::String & option) {
-    options.push_back(
-      Option{option,            // Option text.
-            (tag[0] == '['),    // Is it correct?
-            tag.Has('>'),       // Is it in a fixed position?
-            tag.Has('+'),       // Is it required?
-            ""                  // Feedback to student
-            });      
-      last_edit = Section::OPTIONS;
-  }  
 
   void AddTags(String line) {
     line.Compress();
@@ -207,14 +142,18 @@ public:
     return emp::Has(base_tags, tag) || emp::Has(exclusive_tags, tag) || emp::Has(config_tags, tag);
   }
 
-  void Print(std::ostream & os=std::cout) const;
-  void PrintD2L(std::ostream & os=std::cout) const;
-  void PrintHTML(std::ostream & os=std::cout, size_t q_num=0) const;
-  void PrintJS(std::ostream & os=std::cout) const;
-  void PrintLatex(std::ostream & os=std::cout) const;
 
-  void Validate();
-  void ReduceOptions(emp::Random & random, size_t correct_target, size_t incorrect_target);
-  void ShuffleOptions(emp::Random & random);
-  void Generate(emp::Random & random);
+  // ----- Virtual Function for Specific Question Types -----
+
+  virtual void AddOption(const emp::String & line) = 0;
+  virtual void AddOption(emp::String tag, const emp::String & option) = 0;
+
+  virtual void Print(std::ostream & os=std::cout) const = 0;
+  virtual void PrintD2L(std::ostream & os=std::cout) const = 0;
+  virtual void PrintHTML(std::ostream & os=std::cout, size_t q_num=0) const = 0;
+  virtual void PrintJS(std::ostream & os=std::cout) const = 0;
+  virtual void PrintLatex(std::ostream & os=std::cout) const = 0;
+
+  virtual void Validate() = 0;
+  virtual void Generate(emp::Random & random) = 0;
 };
