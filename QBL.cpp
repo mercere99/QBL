@@ -44,6 +44,8 @@ private:
 
 public:
   QBL(int argc, char * argv[]) : flags(argc, argv) {
+ //    flags.AddOption('c', "--command",     [this](){},
+ //      "Run a single interactive command; e.g. `var=12`.");
     flags.AddOption('d', "--d2l",     [this](){ SetFormat(Format::D2L); },
       "Set output to be D2L / Brightspace csv quiz upload format.");
     flags.AddOption('D', "--debug",   [this](){ SetFormat(Format::DEBUG); },
@@ -54,6 +56,8 @@ public:
       "Provide usage information for QBL.");
     flags.AddOption('i', "--include", [this](String arg){ _AddTags(include_tags, arg); },
       "Include ALL questions with the following tag(s), not otherwise excluded.");
+//    flags.AddOption('I', "--interactive",     [this](){},
+//      "Start QBL in interactive mode for more dynamic exam generation.");
     flags.AddOption('l', "--latex",   [this](){ SetFormat(Format::LATEX); },
       "Set output to be Latex format.");
     flags.AddOption('o', "--output",  [this](String arg){ SetOutput(arg); },
@@ -66,8 +70,8 @@ public:
       "Set the random seed");
     flags.AddOption('s', "--sample",  [this](String arg){ _AddTags(sample_tags, arg); },
       "At least one question with the following tag(s) should be included.");
-//    flags.AddOption('S', "--set",     [this](){},
-//      "Run the following argument to set a value; e.g. `var=12`.");
+//    flags.AddOption('S', "--seed",     [this](){},
+//      "Set the random number seed with the following argument [arg]");
     flags.AddOption('t', "--title", [this](String arg){ SetTitle(arg); },
       "Specify the quiz title to use in the generated file.");
     flags.AddOption('v', "--version", [this](){ PrintVersion(); },
