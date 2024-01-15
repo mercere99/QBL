@@ -4,7 +4,7 @@ default: native
 EMP_DIR   = ../Empirical
 
 TARGET := QBL
-CPP_FILES := QBL.cpp Question.cpp
+CPP_FILES := QBL.cpp Question_MultipleChoice.cpp
 
 # Specify sets of compilation flags to use
 FLAGS_version := -std=c++20

@@ -1,18 +1,20 @@
 #pragma once
 
 #include "emp/base/notify.hpp"
+#include "emp/base/Ptr.hpp"
 #include "emp/base/vector.hpp"
 #include "emp/math/Random.hpp"
 #include "emp/math/random_utils.hpp"
 #include "emp/tools/String.hpp"
 
 #include "Question.hpp"
+#include "Question_MultipleChoice.hpp"
 
 using emp::String;
 
 class QuestionBank {
 private:
-  emp::vector<Question> questions;
+  emp::vector<emp::Ptr<Question>> questions;
   emp::vector<String> source_files;
   bool start_new = true;            // Should next text start a new question?
 
@@ -32,14 +34,19 @@ private:
 
   Question & CurQ() {
     if (start_new) {
-      questions.emplace_back(questions.size() + 1);
+      size_t next_id = questions.size() + 1;
+      auto new_q = emp::NewPtr<Question_MultipleChoice>(next_id);
+      questions.push_back(new_q);
       start_new = false;
     }
 
-    return questions.back();
+    return *questions.back();
   }
 public:
   QuestionBank() { }
+  ~QuestionBank() {
+    for (auto ptr : questions) ptr.Delete();
+  }
 
   void NewEntry() { start_new = true; }
 
@@ -73,7 +80,7 @@ public:
   }
 
   void Validate() {
-    for (auto & q : questions) q.Validate();
+    for (auto & q : questions) q->Validate();
   }
 
   // Exclude the specified question.  Report any problems.
@@ -93,11 +100,11 @@ public:
     if (q_status[id] == QStatus::INCLUDED) return; // Already included.
 
     // If there are any exclusive tags, honor them.
-    const auto & exclude_tags = questions[id].GetExclusiveTags();
+    const auto & exclude_tags = questions[id]->GetExclusiveTags();
     for (const auto & tag : exclude_tags) {
       for (size_t i = 0; i < questions.size(); ++i) {
         if (i == id) continue;
-        if (questions[i].HasTag(tag)) {
+        if (questions[i]->HasTag(tag)) {
           Generate_ExcludeQuestion(i, MakeString("Conflict with tag '", tag, "'"));
         }
       }
@@ -111,10 +118,10 @@ public:
   void Generate_DoExcludes(const tag_set_t & exclude_tags, const tag_set_t & require_tags) {
     for (size_t i = 0; i < questions.size(); ++i) {
       for (const auto & tag : exclude_tags) {
-        if (questions[i].HasTag(tag)) Generate_ExcludeQuestion(i, "has exclude tag");
+        if (questions[i]->HasTag(tag)) Generate_ExcludeQuestion(i, "has exclude tag");
       }
       for (const auto & tag : require_tags) {
-        if (!questions[i].HasTag(tag)) Generate_ExcludeQuestion(i, "doesn't have required tag");
+        if (!questions[i]->HasTag(tag)) Generate_ExcludeQuestion(i, "doesn't have required tag");
       }
     }
   }
@@ -123,9 +130,9 @@ public:
   void Generate_DoIncludes(const tag_set_t & include_tags) {
     // Handle include tags.
     for (size_t i = 0; i < questions.size(); ++i) {
-      if (questions[i].IsRequired()) Generate_IncludeQuestion(i, "marked required");
+      if (questions[i]->IsRequired()) Generate_IncludeQuestion(i, "marked required");
       for (const auto & tag : include_tags) {
-        if (questions[i].HasTag(tag)) Generate_IncludeQuestion(i, "has include tag");
+        if (questions[i]->HasTag(tag)) Generate_IncludeQuestion(i, "has include tag");
       }
     }
   }
@@ -136,7 +143,7 @@ public:
       bool sampled = false;
       for (size_t id=0; id < questions.size(); ++id) {
         // Skip questions that don't have the tag or are already excluded.
-        if (!questions[id].HasTag(tag) || q_status[id] == QStatus::EXCLUDED) continue;
+        if (!questions[id]->HasTag(tag) || q_status[id] == QStatus::EXCLUDED) continue;
 
         // If a question with the tag is already included, we are done!
         if (q_status[id] == QStatus::INCLUDED) { sampled=true; break; }
@@ -158,7 +165,10 @@ public:
   // Remove all of the questions that we are not going to use.
   void Generate_PurgeUnused() {
     for (size_t i = questions.size()-1; i < questions.size(); --i) {
-      if (q_status[i] != QStatus::INCLUDED) questions.erase(questions.begin() + i);
+      if (q_status[i] != QStatus::INCLUDED) {
+        questions[i].Delete();
+        questions.erase(questions.begin() + i);
+      }
     }
   }
 
@@ -195,7 +205,7 @@ public:
     emp::Shuffle(random, questions);
 
     // Go through each of the kept questions an limit the choices.
-    for (auto & q : questions) q.Generate(random);
+    for (auto q : questions) q->Generate(random);
   }
 
   void Generate(size_t count, const tag_set_t & include_tags,
@@ -207,31 +217,31 @@ public:
 
   void Print(std::ostream & os=std::cout) const {
     for (size_t id = 0; id < questions.size(); ++id) {
-      questions[id].Print(os);
+      questions[id]->Print(os);
     }
   }
 
   void PrintD2L(std::ostream & os=std::cout) const {
     for (size_t id = 0; id < questions.size(); ++id) {
-      questions[id].PrintD2L(os);
+      questions[id]->PrintD2L(os);
     }
   }
 
   void PrintHTML(std::ostream & os=std::cout) const {
     for (size_t id = 0; id < questions.size(); ++id) {
-      questions[id].PrintHTML(os, id+1);
+      questions[id]->PrintHTML(os, id+1);
     }
   }
 
   void PrintJS(std::ostream & os=std::cout) const {
     for (size_t id = 0; id < questions.size(); ++id) {
-      questions[id].PrintJS(os);
+      questions[id]->PrintJS(os);
     }
   }
 
   void PrintLatex(std::ostream & os=std::cout) const {
     for (size_t id = 0; id < questions.size(); ++id) {
-      questions[id].PrintLatex(os);
+      questions[id]->PrintLatex(os);
     }
   }
 

@@ -1,11 +1,11 @@
-#include "Question.hpp"
+#include "Question_MultipleChoice.hpp"
 
 #include "emp/math/random_utils.hpp"
 #include "functions.hpp"
 
 using emp::MakeCount;
 
-void Question::Print(std::ostream& os) const {
+void Question_MultipleChoice::Print(std::ostream& os) const {
   os << "%- QUESTION " << id << "\n" << question << "\n";
   for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
     os << options[opt_id].GetQBLBullet() << " " << options[opt_id].text << '\n';
@@ -13,7 +13,7 @@ void Question::Print(std::ostream& os) const {
   os << std::endl;
 }
 
-void Question::PrintD2L(std::ostream& os) const {
+void Question_MultipleChoice::PrintD2L(std::ostream& os) const {
   os << "NewQuestion,MC,,,\n"
     << "ID,QBL-" << id << ",,,\n"
     << "Title,,,,\n"
@@ -27,12 +27,12 @@ void Question::PrintD2L(std::ostream& os) const {
        << options[opt_id].feedback << "\n";
   }
   os << "Hint," << hint << ",,,\n"
-     << "Feedback," << feedback << ",HTML,,\n"
+     << "Feedback," << explanation << ",HTML,,\n"
      << ",,,,\n"
      << ",,,,\n";
 }
 
-void Question::PrintHTML(std::ostream & os, size_t q_num) const {
+void Question_MultipleChoice::PrintHTML(std::ostream & os, size_t q_num) const {
   os << "  <!-- Question " << id << " -->\n"
      << "  <div class=\"question\">\n"
      << "    <p><b>";
@@ -53,13 +53,13 @@ void Question::PrintHTML(std::ostream & os, size_t q_num) const {
      << std::endl; // Skip a line.
 }
 
-void Question::PrintJS(std::ostream & os) const {
+void Question_MultipleChoice::PrintJS(std::ostream & os) const {
   emp::notify::TestWarning(CountCorrect() != 1,
     "Web mode expects exactly one correct answer per question; ", CountCorrect(), " found.");
   os << "    q" << id << ": \"" << _OptionLabel(FindCorrectID()) << "\",\n";
 }
 
-void Question::PrintLatex(std::ostream& os) const {
+void Question_MultipleChoice::PrintLatex(std::ostream& os) const {
   os << "% QUESTION " << id << "\n"
      << "\\question " << TextToLatex(question) << "\n"
      << std::endl
@@ -83,7 +83,7 @@ void Question::PrintLatex(std::ostream& os) const {
   os << "\\end{mcanswerslist}\n" << std::endl;
 }
 
-void Question::Validate() {
+void Question_MultipleChoice::Validate() {
   // Collect config info for this question.
   correct_range = _GetConfig(":correct", emp::Range<size_t>(1,1));
   option_range = _GetConfig(":options", emp::Range<size_t>(options.size(),options.size()));
@@ -127,7 +127,7 @@ void Question::Validate() {
     "Has fixed-position options in middle; fixed positions must be at start and end.");
 }
 
-void Question::ReduceOptions(emp::Random& random, size_t correct_target,
+void Question_MultipleChoice::ReduceOptions(emp::Random& random, size_t correct_target,
                              size_t incorrect_target) {
   emp_assert(correct_target <= CountCorrect());
   emp_assert(incorrect_target <= CountIncorrect());
@@ -163,7 +163,7 @@ void Question::ReduceOptions(emp::Random& random, size_t correct_target,
   }
 }
 
-void Question::ShuffleOptions(emp::Random& random) {
+void Question_MultipleChoice::ShuffleOptions(emp::Random& random) {
   // Find the option range to shuffle.
   size_t first_id = 0;
   while (first_id < options.size() && options[first_id].is_fixed) first_id++;
@@ -173,7 +173,7 @@ void Question::ShuffleOptions(emp::Random& random) {
   emp::ShuffleRange(random, options, first_id, last_id);
 }
 
-void Question::Generate(emp::Random & random) {
+void Question_MultipleChoice::Generate(emp::Random & random) {
   // Determine if we are going to toggle this question to its alternate form.
   double alt_p = _GetConfig(":alt_prob", 0.5);
   if (alt_question.size() && random.P(alt_p)) {
