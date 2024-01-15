@@ -44,42 +44,55 @@ private:
 
 public:
   QBL(int argc, char * argv[]) : flags(argc, argv) {
- //    flags.AddOption('c', "--command",     [this](){},
- //      "Run a single interactive command; e.g. `var=12`.");
-    flags.AddOption('d', "--d2l",     [this](){ SetFormat(Format::D2L); },
-      "Set output to be D2L / Brightspace csv quiz upload format.");
-    flags.AddOption('D', "--debug",   [this](){ SetFormat(Format::DEBUG); },
-      "Print extra debug information.");
+    flags.AddGroup("Basic Operation",
+      "These flags are the standard ones to use when running QBL.\n");
     flags.AddOption('g', "--generate",[this](String arg){ SetGenerate(arg); },
       "Randomly generate questions (number as arg).");
-    flags.AddOption('h', "--help",    [this](){ PrintHelp(); },
-      "Provide usage information for QBL.");
-    flags.AddOption('i', "--include", [this](String arg){ _AddTags(include_tags, arg); },
-      "Include ALL questions with the following tag(s), not otherwise excluded.");
 //    flags.AddOption('I', "--interactive",     [this](){},
 //      "Start QBL in interactive mode for more dynamic exam generation.");
-    flags.AddOption('l', "--latex",   [this](){ SetFormat(Format::LATEX); },
-      "Set output to be Latex format.");
     flags.AddOption('o', "--output",  [this](String arg){ SetOutput(arg); },
       "Set output file name [arg].");
-    flags.AddOption('q', "--qbl",     [this](){ SetFormat(Format::QBL); },
-      "Set output to be QBL format.");
-    flags.AddOption('r', "--require", [this](String arg){ _AddTags(require_tags, arg); },
-      "Only questions with the following tag(s) can be included.");
     flags.AddOption('R', "--random", [this](String arg){ SetRandomSeed(arg); },
       "Set the random seed");
-    flags.AddOption('s', "--sample",  [this](String arg){ _AddTags(sample_tags, arg); },
-      "At least one question with the following tag(s) should be included.");
-//    flags.AddOption('S', "--seed",     [this](){},
+//    flags.AddOption('S', "--seed",     [this](String arg){ SetRandomSeed(arg); },
 //      "Set the random number seed with the following argument [arg]");
     flags.AddOption('t', "--title", [this](String arg){ SetTitle(arg); },
-      "Specify the quiz title to use in the generated file.");
-    flags.AddOption('v', "--version", [this](){ PrintVersion(); },
-      "Provide QBL version information.");
+      "Specify the quiz/exam title to use in the generated file.");
+
+    flags.AddGroup("Output Format",
+      "These flags specify the output format to use.  If none are provided, the\n"
+      "extension on the output filename is used, or else QBL format is the default.\n");
+    flags.AddOption('d', "--d2l",     [this](){ SetFormat(Format::D2L); },
+      "Set output to be D2L / Brightspace csv quiz upload format.");
+    flags.AddOption('l', "--latex",   [this](){ SetFormat(Format::LATEX); },
+      "Set output to be Latex format.");
+    flags.AddOption('q', "--qbl",     [this](){ SetFormat(Format::QBL); },
+      "Set output to be QBL format.");
     flags.AddOption('w', "--web",     [this](){ SetFormat(Format::WEB); },
       "Set output to HTML/CSS/JS format.");
+
+    flags.AddGroup("Question Specification",
+      "These options provide addition constraints as QBL decides which questions\n"
+      "should or should not be used in the output.\n");
+    flags.AddOption('i', "--include", [this](String arg){ _AddTags(include_tags, arg); },
+      "Include ALL questions with the following tag(s), not otherwise excluded.");
+    flags.AddOption('r', "--require", [this](String arg){ _AddTags(require_tags, arg); },
+      "Only questions with the following tag(s) can be included.");
+    flags.AddOption('s', "--sample",  [this](String arg){ _AddTags(sample_tags, arg); },
+      "At least one question with the following tag(s) should be included.");
     flags.AddOption('x', "--exclude", [this](String arg){ _AddTags(exclude_tags, arg); },
       "Exclude all questions with following tag(s).");
+
+    flags.SetGroup("none");
+ //    flags.AddOption('c', "--command",     [this](){},
+ //      "Run a single interactive command; e.g. `var=12`.");
+    flags.AddOption('D', "--debug",   [this](){ SetFormat(Format::DEBUG); },
+      "Print extra debug information.");
+    flags.AddOption('h', "--help",    [this](){ PrintHelp(); },
+      "Provide usage information for QBL (this message)");
+    flags.AddOption('v', "--version", [this](){ PrintVersion(); },
+      "Provide QBL version information.");
+
 
     flags.Process();
     question_files = flags.GetExtras();
