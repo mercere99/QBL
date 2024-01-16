@@ -59,6 +59,8 @@ public:
     switch (line[0]) {
     case '*':                         // Question option (incorrect)
     case '[':                         // Question option (correct)
+    case '+':                         // Question option (mandatory)
+    case '>':                         // Question option (locked position)
       tag = line.PopWord();
       CurQ().AddOption(tag, line);
       break;
