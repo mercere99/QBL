@@ -20,6 +20,14 @@ private:
 
   bool randomize = true;            // Should we randomize the answer options?
 
+  enum class QType {
+    UNKNOWN = 0,
+    MULTIPLE_CHOICE,
+    SHORT_ANSWER
+  };
+  QType question_type = QType::MULTIPLE_CHOICE;
+  String default_tags = "";
+
   enum class QStatus {
     UNKNOWN = 0,
     EXCLUDED,
@@ -29,14 +37,15 @@ private:
   size_t include_count=0;           // Number of questions selected for inclusion.
   size_t exclude_count=0;           // Number of questions excluded.
 
-
   using tag_set_t = emp::vector<String>;
+
 
   Question & CurQ() {
     if (start_new) {
       size_t next_id = questions.size() + 1;
       auto new_q = emp::NewPtr<Question_MultipleChoice>(next_id);
       questions.push_back(new_q);
+      if (default_tags.size()) new_q->AddTags(default_tags);
       start_new = false;
     }
 
@@ -48,15 +57,53 @@ public:
     for (auto ptr : questions) ptr.Delete();
   }
 
+  String GetQuestionType() const {
+    switch (question_type) {
+      using enum QType;
+      case UNKNOWN: return "Unknown";
+      case MULTIPLE_CHOICE: return "Multiple Choice";
+      case SHORT_ANSWER: return "Short Answer";
+    }
+    return "Invalid";
+  }
+
   void NewEntry() { start_new = true; }
 
   void NewFile(String filename) { source_files.push_back(filename), start_new = true; }
+
+  /// Process the provided line to change behavior of QBL.
+  void ProcessControl(String line) {
+    String command = line.PopWord();
+    if (command == "/use_tags") {              // Add provided tags to all subsequent questions
+      default_tags = line;
+    }
+    else if (command == "/multiple_choice") {  // Change question type to multiple choice
+      question_type = QType::MULTIPLE_CHOICE;
+    }
+    else if (command == "/short_answer") {     // Change question type to short answer
+      question_type = QType::SHORT_ANSWER;
+    }
+    else if (command == "/print") {            // Print provided info to standard output.
+      std::cout << line << std::endl;
+    }
+    else if (command == "/print_status") {     // Print the current status to standard output.
+      // If there is anything else on this line, print it as a header.
+      if (line.size()) std::cout << line << '\n';
+      PrintDebug();
+    }
+    else {
+      emp::notify::Warning("Unknown control command '", command, "'.  Ignoring.");
+    }
+  }
 
   void AddLine(String line) {
     emp::String tag;
 
     // The first character on a line determines what that line is.
     switch (line[0]) {
+    case '/':                         // Control setting (to change question defaults)
+      ProcessControl(line);
+      break;
     case '*':                         // Question option (incorrect)
     case '[':                         // Question option (correct)
     case '+':                         // Question option (mandatory)
@@ -249,8 +296,13 @@ public:
 
   void PrintDebug(std::ostream & os=std::cout) const {
     os << "Question Bank\n"
-       << "  num questions: " << questions.size() << "\n"
-       << "  source files:  " << MakeLiteral(source_files) << "\n"
+       << "  source files:  " << MakeLiteral(source_files) << '\n'
+       << "  num questions: " << questions.size() << '\n'
+       << "    ...included:  " << include_count << '\n'
+       << "    ...excluded:  " << exclude_count << '\n'
+       << "    ...undecided: " << (questions.size() - include_count - exclude_count) << '\n'
+       << "  randomize answers?: " << randomize << '\n'
+       << "  default question type: " << GetQuestionType()
        << std::endl;
   }
 };
