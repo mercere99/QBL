@@ -59,11 +59,26 @@ protected:
   }
 
   template <typename... Ts>
-  bool _TestError(bool test, Ts &&... args) {
-    if (test) {
-      emp::notify::Error("Question ", id, " (", question, ")", ": ",
-                         std::forward<Ts>(args)...);
-    }
+  void _Warning(Ts &&... args) const {
+    emp::notify::Warning("Question ", id, " (", question, ")", ": ",
+                        std::forward<Ts>(args)...);
+  }
+
+  template <typename... Ts>
+  bool _TestWarning(bool test, Ts &&... args) const {
+    if (test) _Warning(std::forward<Ts>(args)...);
+    return test;
+  }
+
+  template <typename... Ts>
+  void _Error(Ts &&... args) const {
+    emp::notify::Error("Question ", id, " (", question, ")", ": ",
+                        std::forward<Ts>(args)...);
+  }
+
+  template <typename... Ts>
+  bool _TestError(bool test, Ts &&... args) const {
+    if (test) _Error(std::forward<Ts>(args)...);
     return test;
   }
 
@@ -124,13 +139,13 @@ public:
       if (tag[0] == '#') base_tags.push_back(tag);
       else if (tag[0] == '^') exclusive_tags.push_back(tag);
       else if (tag[0] == ':') {
-        emp::notify::TestError(!tag.Has('='), "Tag '", tag, "' must have an assignment.");
+        _TestError(!tag.Has('='), "Tag '", tag, "' must have an assignment.");
         String name = tag.Pop('=');
-        emp::notify::TestError(tag.size() == 0, "Tag '", tag, "' must have value after '='.");
+        _TestError(tag.size() == 0, "Tag '", tag, "' must have value after '='.");
         config_tags[name] = tag;
       }
       else {
-        emp::notify::Error("Unknown tag type '", tag, "'.");
+        _Error("Unknown tag type '", tag, "'.");
       }
     }
   }
