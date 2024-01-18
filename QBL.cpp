@@ -388,14 +388,14 @@ public:
 
 int main(int argc, char * argv[])
 {
-  QBL qbl(argc, argv);
   if (argc == 1) {
     std::cout << "No arguments provided.\n"
-      "Format: " << argv[0] << " -o [output_filename] -g [question_count] [OTHER FLAGS]\n"
-      "...use '" << argv[0] << " -h' for help."
+      "Format: " << argv[0] << " question_filename(s) {-o [output_filename]} {-g [question_count]} [OTHER FLAGS]\n"
+      "or use '" << argv[0] << " -h' for a more detailed help message."
       << std::endl;
     exit(1);
   }
+  QBL qbl(argc, argv);
   qbl.LoadFiles();
   qbl.Generate();
   qbl.Print();
