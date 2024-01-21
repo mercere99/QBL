@@ -18,7 +18,7 @@ void Question_MultipleChoice::PrintD2L(std::ostream& os) const {
     << "ID,QBL-" << id << ",,,\n"
     << "Title,,,,\n"
     << "QuestionText," << TextToD2L(question) << ",HTML,,\n"
-    << "Points,5,,,\n"
+    << "Points," << points << ",,,\n"
     << "Difficulty,1,,,\n"
     << "Image,,,,\n";
   for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
@@ -54,7 +54,7 @@ void Question_MultipleChoice::PrintHTML(std::ostream & os, size_t q_num) const {
 }
 
 void Question_MultipleChoice::PrintJS(std::ostream & os) const {
-  emp::notify::TestWarning(CountCorrect() != 1,
+  _TestWarning(CountCorrect() != 1,
     "Web mode expects exactly one correct answer per question; ", CountCorrect(), " found.");
   os << "    q" << id << ": \"" << _OptionLabel(FindCorrectID()) << "\",\n";
 }

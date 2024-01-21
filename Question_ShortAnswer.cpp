@@ -15,7 +15,7 @@ void Question_ShortAnswer::PrintD2L(std::ostream& os) const {
     << "ID,QBL-" << id << ",,,\n"
     << "Title,,,,\n"
     << "QuestionText," << TextToD2L(question) << ",HTML,,\n"
-    << "Points,5,,,\n"
+    << "Points," << points << ",,,\n"
     << "Difficulty,1,,,\n"
     << "Image,,,,\n";
   for (const String & option : answers) {

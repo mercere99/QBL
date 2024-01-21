@@ -28,6 +28,7 @@ protected:
   emp::vector<String> exclusive_tags;  ///< Tags for question groups where only one should be used.
   std::map<String,String> config_tags; ///< Tags to specify question details (num options, etc)
 
+  size_t points = 5;          ///< How many points should this question be worth?
   bool is_required = false;   ///< Must this question be used on a generated quiz?
   bool is_fixed = false;      ///< Is this question locked into this order?
 
