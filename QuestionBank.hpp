@@ -9,6 +9,7 @@
 
 #include "Question.hpp"
 #include "Question_MultipleChoice.hpp"
+#include "Question_ShortAnswer.hpp"
 
 using emp::String;
 
@@ -43,7 +44,17 @@ private:
   Question & CurQ() {
     if (start_new) {
       size_t next_id = questions.size() + 1;
-      auto new_q = emp::NewPtr<Question_MultipleChoice>(next_id);
+      emp::Ptr<Question> new_q = nullptr;
+      switch (question_type) {
+      case QType::MULTIPLE_CHOICE:
+        new_q = emp::NewPtr<Question_MultipleChoice>(next_id);
+        break;
+      case QType::SHORT_ANSWER:
+        new_q = emp::NewPtr<Question_ShortAnswer>(next_id);
+        break;
+      default:
+        emp::notify::Error("Unknown Question Type ", GetQuestionType());
+      }
       questions.push_back(new_q);
       if (default_tags.size()) new_q->AddTags(default_tags);
       start_new = false;
@@ -107,7 +118,7 @@ public:
     case '*':                         // Question option (incorrect)
     case '[':                         // Question option (correct)
     case '+':                         // Question option (mandatory)
-    case '>':                         // Question option (locked position)
+    case '>':                         // Question option (locked position or short-answer response)
       tag = line.PopWord();
       CurQ().AddOption(tag, line);
       break;
