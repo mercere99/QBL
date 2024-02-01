@@ -93,6 +93,12 @@ public:
   Question & operator=(const Question &) = default;
   Question & operator=(Question &&) = default;
 
+  size_t GetID() const { return id; }
+  const emp::String & GetQuestion() const { return question; }
+  const emp::String & GetAltQuestion() const { return alt_question; }
+  const emp::String & GetExplanation() const { return explanation; }
+  const emp::String & GetHint() const { return hint; }
+
   bool IsFixed() const { return is_fixed; }
   bool IsRequired() const { return is_required; }
 
