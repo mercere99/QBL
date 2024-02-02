@@ -139,6 +139,26 @@ public:
     }
   }
 
+  void Randomize(emp::Random & random) {
+    // Randomize the order of the questions.
+    /// @todo take into account fixed positions.
+    emp::Shuffle(random, questions);
+  }
+
+  void SortID() {
+    std::sort(questions.begin(), questions.end(),
+              [](emp::Ptr<Question> a, emp::Ptr<Question> b){
+                return a->GetID() < b->GetID();
+              });
+  }
+
+  void SortAlpha() {
+    std::sort(questions.begin(), questions.end(),
+              [](emp::Ptr<Question> a, emp::Ptr<Question> b){
+                return a->GetQuestion() < b->GetQuestion();
+              });
+  }
+
   void Validate() {
     for (auto & q : questions) q->Validate();
   }
@@ -235,7 +255,7 @@ public:
   void Generate(size_t count, emp::Random & random, const tag_set_t & include_tags,
                 const tag_set_t & exclude_tags, const tag_set_t & require_tags,
                 const tag_set_t & sample_tags) {
-    emp::notify::TestError(count > questions.size(), "Requesting more questions (", count,
+    emp::notify::TestWarning(count > questions.size(), "Requesting more questions (", count,
       ") than available in Question Bank (", questions.size(), ")");
 
     // Setup analysis for picking questions.
@@ -258,21 +278,11 @@ public:
     emp::notify::TestWarning(include_count < count,
       "Unable to select ", count, " questions given exclusions; only ", include_count, " used.");
 
+    // Remove any questions that were not picked during generation
     Generate_PurgeUnused();
-
-    // Randomize the order of the questions.
-    /// @todo take into account fixed positions.
-    emp::Shuffle(random, questions);
 
     // Go through each of the kept questions an limit the choices.
     for (auto q : questions) q->Generate(random);
-  }
-
-  void Generate(size_t count, const tag_set_t & include_tags,
-                const tag_set_t & exclude_tags, const tag_set_t & require_tags,
-                const tag_set_t & sample_tags, int random_seed=-1) {
-    emp::Random random(random_seed);
-    Generate(count, random, include_tags, exclude_tags, require_tags, sample_tags);
   }
 
   void Print(std::ostream & os=std::cout) const {
