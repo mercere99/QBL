@@ -26,7 +26,15 @@ private:
     DEBUG
   };
 
+  enum class Order {
+    DEFAULT = 0,
+    RANDOM,
+    ID,
+    ALPHABETIC
+  };
+
   Format format = Format::NONE;       // No format set yet.
+  Order order = Order::DEFAULT;       // Don't reorder questions.
   String base_path = "";              // Where are we placing these files?
   String base_filename = "";          // Output filename; empty=no file
   String extension = "";              // Provided extension to use for output file.
@@ -37,7 +45,7 @@ private:
   emp::vector<String> sample_tags;    // Include at least one question with each of these tags.
   emp::vector<String> question_files;
   size_t generate_count = 0;          // How many questions should be generated? (0 = use all)
-  int random_seed = -1;               // Random seed for generating questions (-1 = use time)
+  emp::Random random;                 // Random number generator
 
   // Helper functions
   void _AddTags(emp::vector<String> & tags, const String & arg) { emp::Append(tags, arg.Slice()); }
@@ -52,10 +60,8 @@ public:
 //      "Start QBL in interactive mode for more dynamic exam generation.");
     flags.AddOption('o', "--output",  [this](String arg){ SetOutput(arg); },
       "Set output file name [arg].");
-    flags.AddOption('R', "--random", [this](String arg){ SetRandomSeed(arg); },
-      "Set the random seed");
-//    flags.AddOption('S', "--seed",     [this](String arg){ SetRandomSeed(arg); },
-//      "Set the random number seed with the following argument [arg]");
+    flags.AddOption('S', "--seed", [this](String arg){ SetRandomSeed(arg); },
+      "Set the random number seed with the following argument [arg]");
     flags.AddOption('t', "--title", [this](String arg){ SetTitle(arg); },
       "Specify the quiz/exam title to use in the generated file.");
 
@@ -70,6 +76,8 @@ public:
       "Set output to be QBL format.");
     flags.AddOption('w', "--web",     [this](){ SetFormat(Format::WEB); },
       "Set output to HTML/CSS/JS format.");
+    flags.AddOption('O', "--order",   [this](String arg){ SetOrder(arg); },
+      "Set the question order based on [arg] (\"random\", \"id\", or \"alpha\")");
 
     flags.AddGroup("Question Specification",
       "These options provide addition constraints as QBL decides which questions\n"
@@ -138,11 +146,30 @@ public:
       emp::notify::Error("Can only set one value for number of questions to generate.");
     }
     generate_count = _count.As<size_t>();
+    // If order hasn't been manually set, change it to random.
+    if (order == Order::DEFAULT) order = Order::RANDOM;
   }
   
   void SetRandomSeed(String _seed) {
-    random_seed = _seed.As<int>();
+    int random_seed = _seed.As<int>();
     std::cout << "Using random seed: " << random_seed << std::endl;
+    random.ResetSeed(random_seed);
+  }
+
+  void SetOrder(String _order) {
+    if (_order == "random") { order = Order::RANDOM; }
+    else if (_order == "id") { order = Order::ID; }
+    else if (_order == "alpha") { order = Order::ALPHABETIC; }
+    // @CAO - Other options are layout filenames
+  }
+
+  void UpdateOrder() {
+    switch (order) {
+    case Order::DEFAULT:    break; // No changes needed
+    case Order::RANDOM:     qbank.Randomize(random); break;
+    case Order::ID:         qbank.SortID();          break;
+    case Order::ALPHABETIC: qbank.SortAlpha();       break;
+    }
   }
 
   void PrintVersion() const {
@@ -185,8 +212,8 @@ public:
   void Generate() {
     qbank.Validate();
     if (generate_count) {
-      qbank.Generate(generate_count, include_tags, exclude_tags, 
-          require_tags, sample_tags, random_seed);
+      qbank.Generate(generate_count, random, include_tags, exclude_tags, 
+          require_tags, sample_tags);
     }
   }
 
@@ -398,5 +425,6 @@ int main(int argc, char * argv[])
   QBL qbl(argc, argv);
   qbl.LoadFiles();
   qbl.Generate();
+  qbl.UpdateOrder();
   qbl.Print();
 }
