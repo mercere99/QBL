@@ -326,4 +326,17 @@ public:
        << "  default question type: " << GetQuestionType()
        << std::endl;
   }
+
+  void LogQuestions(std::ostream & os) const {
+    for (auto q_ptr : questions) {
+      os << q_ptr->GetID() << '\n';
+    }
+  }
+
+  void LogQuestions(String filename) const {
+    emp::notify::Message("Printing log file of question IDs '", filename, "'.");
+    std::ofstream out_file(filename);
+    LogQuestions(out_file);
+    out_file.close();
+  }
 };

@@ -38,6 +38,7 @@ private:
   String base_path = "";              // Where are we placing these files?
   String base_filename = "";          // Output filename; empty=no file
   String extension = "";              // Provided extension to use for output file.
+  String log_filename = "";           // Where should we log questions to?
   String title = "Multiple Choice Quiz"; // Title to use in any generated files.
   emp::vector<String> include_tags;   // Include ALL questions with these tags.
   emp::vector<String> exclude_tags;   // Exclude ALL questions with these tags (override includes)
@@ -90,6 +91,9 @@ public:
       "At least one question with the following tag(s) should be included.");
     flags.AddOption('x', "--exclude", [this](String arg){ _AddTags(exclude_tags, arg); },
       "Exclude all questions with following tag(s).");
+    flags.AddOption('L', "--log", [this](String arg){ log_filename = arg; },
+      "Log the IDs of the questions chosen to the file provided.");
+    
 
     flags.SetGroup("none");
  //    flags.AddOption('c', "--command",     [this](){},
@@ -229,6 +233,11 @@ public:
   }
 
   void Print() const {
+    // If we are supposed to save a log of questions, do so.
+    if (log_filename.size()) {
+      qbank.LogQuestions(log_filename);
+    }
+
     // If there is no filename, just print to standard out.
     if (!base_filename.size()) { Print(format); return; }
 
