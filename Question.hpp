@@ -31,6 +31,7 @@ protected:
   size_t points = 5;          ///< How many points should this question be worth?
   bool is_required = false;   ///< Must this question be used on a generated quiz?
   bool is_fixed = false;      ///< Is this question locked into this order?
+  size_t avoid = 0;           ///< How many times should we skip this question before picking it?
 
   // Which section are we currently loading in?  Needed for multi-line entries.
   enum class Section {
@@ -164,6 +165,9 @@ public:
     return emp::Has(base_tags, tag) || emp::Has(exclusive_tags, tag) || emp::Has(config_tags, tag);
   }
 
+  size_t GetAvoid() const { return avoid; }
+  void IncAvoid() { ++avoid; }
+  void DecayAvoid() { if (avoid) avoid--; }
 
   // ----- Virtual Function for Specific Question Types -----
 

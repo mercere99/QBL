@@ -175,6 +175,12 @@ public:
 
   // Include the specified question.  Report any problems.
   void Generate_IncludeQuestion(size_t id, String reason) {
+    // If a question should be avoided, reduce the avoid count and defer selecting it for now.
+    if (questions[id]->GetAvoid()) {
+      questions[id]->DecayAvoid();
+      return;
+    }
+
     emp::notify::TestError(q_status[id] == QStatus::EXCLUDED,
       "Question ", id, " being included (", reason, "), but already excluded.");
     if (q_status[id] == QStatus::INCLUDED) return; // Already included.
@@ -192,6 +198,24 @@ public:
 
     q_status[id] = QStatus::INCLUDED;
     include_count++;
+  }
+
+  void Generate_SetupAvoids(const emp::vector<String> & avoid_files) {
+    for (const String & filename : avoid_files) {
+      std::ifstream file(filename);
+      emp::notify::TestError(!file, "Unable to open avoid file '", filename, "'. Skipping.");
+      size_t id;
+      while (file >> id) {
+        size_t index = id-1;  // Question IDs start at 1; indices start at zero.
+        if (index >= questions.size()) {
+          emp::notify::Warning("Cannot avoid Question '", id, "' only ",
+                               questions.size(), " questions available.");
+          continue;
+        }
+        emp::notify::TestError(id != questions[index]->GetID(), "mismatched ID; ", id, " != ", questions[index]->GetID());
+        questions[index]->IncAvoid();
+      }
+    }
   }
 
   // Scan through all of the questions and remove those that either have an excluded tag or don't have a required tag.
@@ -254,7 +278,7 @@ public:
 
   void Generate(size_t count, emp::Random & random, const tag_set_t & include_tags,
                 const tag_set_t & exclude_tags, const tag_set_t & require_tags,
-                const tag_set_t & sample_tags) {
+                const tag_set_t & sample_tags, const emp::vector<String> & avoid_files) {
     emp::notify::TestWarning(count > questions.size(), "Requesting more questions (", count,
       ") than available in Question Bank (", questions.size(), ")");
 
@@ -263,6 +287,7 @@ public:
     include_count = 0;
     exclude_count = 0;
 
+    Generate_SetupAvoids(avoid_files);
     Generate_DoExcludes(exclude_tags, require_tags);
     Generate_DoIncludes(include_tags);
     Generate_DoSamples(random, sample_tags);

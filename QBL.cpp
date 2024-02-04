@@ -44,7 +44,8 @@ private:
   emp::vector<String> exclude_tags;   // Exclude ALL questions with these tags (override includes)
   emp::vector<String> require_tags;   // ONLY questions with these tags can be included.
   emp::vector<String> sample_tags;    // Include at least one question with each of these tags.
-  emp::vector<String> question_files;
+  emp::vector<String> question_files; // Full set of questions
+  emp::vector<String> avoid_files;    // Files with lists of questions IDs to avoid
   size_t generate_count = 0;          // How many questions should be generated? (0 = use all)
   emp::Random random;                 // Random number generator
 
@@ -92,7 +93,9 @@ public:
     flags.AddOption('x', "--exclude", [this](String arg){ _AddTags(exclude_tags, arg); },
       "Exclude all questions with following tag(s).");
     flags.AddOption('L', "--log", [this](String arg){ log_filename = arg; },
-      "Log the IDs of the questions chosen to the file provided.");
+      "Log the IDs of the questions chosen to the file [arg].");
+    flags.AddOption('a', "--avoid", [this](String arg){ avoid_files.push_back(arg); },
+      "Provide a filename ([arg]) to avoid questions from; can previously be generated as log.");
     
 
     flags.SetGroup("none");
@@ -217,7 +220,7 @@ public:
     qbank.Validate();
     if (generate_count) {
       qbank.Generate(generate_count, random, include_tags, exclude_tags, 
-          require_tags, sample_tags);
+          require_tags, sample_tags, avoid_files);
     }
   }
 
