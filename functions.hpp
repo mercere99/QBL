@@ -81,6 +81,11 @@ static inline emp::String LineToLatex(emp::String line) {
   bool in_codeblock = line.HasPrefix("    ");
   bool in_code = in_codeblock;
 
+  // Everything between backslash \& and ; or \< to > make literal
+  char scan_to = '\0';
+  bool start_scan = false;
+  emp::String scan_word;
+
   if (in_codeblock) {
     line.PopFixed(4);
     out_line += "\\texttt{";
@@ -94,6 +99,44 @@ static inline emp::String LineToLatex(emp::String line) {
   }
 
   for (char c : line) {
+    if (scan_to) {  // Do we need to literally translate?
+      if (scan_to == c) {
+        if (c == ';') {
+          if (scan_word == "Theta") out_line += "$\\Theta$";
+          else if (scan_word == "Omega") out_line += "$\\Omega$";
+        }
+        else if (c == '>') {
+          if (scan_word == "b") out_line += "\\textbf{";
+          else if (scan_word == "/b") out_line += "}";
+          else if (scan_word == "i") out_line += "\\textit{";
+          else if (scan_word == "/i") out_line += "}";
+          else if (scan_word == "sup") out_line += "\\textsuperscript{";
+          else if (scan_word == "/sup") out_line += "}";
+          else if (scan_word == "sub") out_line += "\\textsubscript{";
+          else if (scan_word == "/sub") out_line += "}";
+        }
+        scan_to = '\0';
+        scan_word = "";
+      } else {
+        scan_word += c;
+      }
+      continue;
+    }
+
+    if (start_scan) {
+      switch (c) {
+      case '&': scan_to = ';'; break;
+      case '<': scan_to = '>'; break;
+      case '\\': out_line += c; break;
+      case 'n': out_line += "\\\\ "; break;
+      default:
+        std::cerr << "Error: Unknown escape character '" << c << "'.\n" << std::endl;
+        exit(1);
+      }
+      start_scan = false;
+      continue;
+    }
+
     switch (c) {
       case '{': out_line += "\\{";  break;
       case '}': out_line += "\\}";  break;
@@ -102,6 +145,7 @@ static inline emp::String LineToLatex(emp::String line) {
       case '~': out_line += "\\~";  break;
       case '#': out_line += "\\#";  break;
       case '_': out_line += "\\_";  break;
+      case '\\': start_scan = true; break;
 
       // Replace ` with \texttt{ or }
       case '`':
@@ -161,7 +205,7 @@ static inline emp::String LineToHTML(emp::String line) {
       case '&': out_line += c; scan_to = ';'; break;
       case '<': out_line += c; scan_to = '>'; break;
       case '\\': out_line += c; break;
-      case '\n': out_line += "<br>"; break;
+      case 'n': out_line += "<br>"; break;
       default:
         std::cerr << "Error: Unknown escape character '" << c << "'.\n" << std::endl;
         exit(1);
