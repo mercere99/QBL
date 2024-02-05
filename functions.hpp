@@ -86,6 +86,9 @@ static inline emp::String LineToLatex(emp::String line) {
   bool start_scan = false;
   emp::String scan_word;
 
+  // If we have a negative value, we need to wait for another char to know the symbol
+  char partial = '\0';
+
   if (in_codeblock) {
     line.PopFixed(4);
     out_line += "\\texttt{";
@@ -99,6 +102,29 @@ static inline emp::String LineToLatex(emp::String line) {
   }
 
   for (char c : line) {
+    if (partial) {
+      int val1 = static_cast<int>(partial);
+      int val2 = static_cast<int>(c);
+      switch (val1) {
+      case -50:
+        switch (val2) {
+        case -87: out_line += "$\\Omega$"; break;
+        case -104: out_line += "$\\Theta$"; break;
+        default:
+          emp::notify::Error("Unknown char combo: ", val1, ",", val2, "\nline: ", line);          
+        }
+        break;
+      default:
+        emp::notify::Error("Unknown char combo: ", val1, ",", val2, "\nline: ", line);          
+      }
+      partial = '\0';
+      continue;
+    }
+    if (c < 0) {
+      partial = c;
+      continue;
+    }
+
     if (scan_to) {  // Do we need to literally translate?
       if (scan_to == c) {
         if (c == ';') {
