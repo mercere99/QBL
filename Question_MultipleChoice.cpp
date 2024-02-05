@@ -32,6 +32,24 @@ void Question_MultipleChoice::PrintD2L(std::ostream& os) const {
      << ",,,,\n";
 }
 
+void Question_MultipleChoice::PrintGradeScope(std::ostream& os, size_t q_num) const {
+  os << "% QUESTION ID " << id << "\n"
+     << "\\noindent\\begin{minipage}{\\linewidth}\n"
+     << "\\vspace{20pt}\\hangpara{1.8em}{1}\n"
+     << q_num << ". " << TextToLatex(question) << "\n"
+     << "\\begin{itemize}[label={}]\n";
+
+  for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
+    os << "\\item \\chooseone ";
+    if (options[opt_id].is_correct) os << "\\showcorrect ";
+    os << TextToLatex(options[opt_id].text) << '\n';
+  }
+
+  os << "\\end{itemize}\n"
+     << "\\end{minipage}\n"
+     << std::endl;
+}
+
 void Question_MultipleChoice::PrintHTML(std::ostream & os, size_t q_num) const {
   os << "  <!-- Question " << id << " -->\n"
      << "  <div class=\"question\">\n"

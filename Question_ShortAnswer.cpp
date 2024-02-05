@@ -27,6 +27,22 @@ void Question_ShortAnswer::PrintD2L(std::ostream& os) const {
      << ",,,,\n";
 }
 
+void Question_ShortAnswer::PrintGradeScope(std::ostream& os, size_t q_num) const {
+  os << "NEED TO UPDATE!!!!\n";
+  // os << "% QUESTION ID " << id << "\n"
+  //    << "\\vspace{10pt}\n"
+  //    << TextToLatex(question) << "\n"
+  //    << "\\begin{itemize}[label={}]\n";
+
+  // for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
+  //   os << "\\item \\chooseone ";
+  //   if (options[opt_id].is_correct) os << "\\showcorrect ";
+  //   os << TextToLatex(options[opt_id].text) << '\n';
+  // }
+
+  // os << "\\end{itemize}\n" << std::endl;
+}
+
 void Question_ShortAnswer::PrintHTML(std::ostream & os, size_t q_num) const {
   os << "  <!-- Question " << id << " -->\n"
      << "  <div class=\"question\">\n"

@@ -322,6 +322,12 @@ public:
     }
   }
 
+  void PrintGradeScope(std::ostream & os=std::cout) const {
+    for (size_t id = 0; id < questions.size(); ++id) {
+      questions[id]->PrintGradeScope(os, id+1);
+    }
+  }
+
   void PrintHTML(std::ostream & os=std::cout) const {
     for (size_t id = 0; id < questions.size(); ++id) {
       questions[id]->PrintHTML(os, id+1);

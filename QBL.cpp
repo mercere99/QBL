@@ -21,6 +21,7 @@ private:
     NONE=0,
     QBL,
     D2L,
+    GRADESCOPE,
     LATEX,
     WEB,
     DEBUG
@@ -72,6 +73,8 @@ public:
       "extension on the output filename is used, or else QBL format is the default.\n");
     flags.AddOption('d', "--d2l",     [this](){ SetFormat(Format::D2L); },
       "Set output to be D2L / Brightspace csv quiz upload format.");
+    flags.AddOption('G', "--gradescope",     [this](){ SetFormat(Format::GRADESCOPE); },
+      "Set output to be in Latex format suitable for using with GradeScope.");
     flags.AddOption('l', "--latex",   [this](){ SetFormat(Format::LATEX); },
       "Set output to be Latex format.");
     flags.AddOption('q', "--qbl",     [this](){ SetFormat(Format::QBL); },
@@ -142,6 +145,7 @@ public:
     // If we don't have a format yet, set it based on the filename.
     if (format == Format::NONE) {
       if (extension == ".csv" || extension == ".d2l") format = Format::D2L;
+      if (extension == ".gscope") format = Format::GRADESCOPE;
       else if (extension == ".html" || extension == ".htm") format = Format::WEB;
       else if (extension == ".tex") format = Format::LATEX;
       else if (extension == ".qbl") format = Format::QBL;
@@ -194,6 +198,7 @@ public:
     switch (id) {
     case Format::NONE: return "NONE";
     case Format::D2L: return "D2L";
+    case Format::GRADESCOPE: return "GRADESCOPE";
     case Format::LATEX: return "LATEX";
     case Format::QBL: return "QBL";
     case Format::WEB: return "WEB";
@@ -226,12 +231,13 @@ public:
 
   void Print(Format out_format, std::ostream & os=std::cout) const {
     switch (out_format) {
-      case Format::QBL:   qbank.Print(os); break;
-      case Format::NONE:  qbank.Print(os); break;
-      case Format::D2L:   qbank.PrintD2L(os); break;
-      case Format::LATEX: qbank.PrintLatex(os); break;
-      case Format::WEB:   emp::notify::Error("Web output must go to files."); break;
-      case Format::DEBUG: PrintDebug(os); break;
+      case Format::QBL:        qbank.Print(os); break;
+      case Format::NONE:       qbank.Print(os); break;
+      case Format::D2L:        qbank.PrintD2L(os); break;
+      case Format::GRADESCOPE: qbank.PrintGradeScope(os); break;
+      case Format::LATEX:      qbank.PrintLatex(os); break;
+      case Format::WEB:        emp::notify::Error("Web output must go to files."); break;
+      case Format::DEBUG:      PrintDebug(os); break;
     }
   }
 
