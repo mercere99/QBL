@@ -4,6 +4,80 @@
 #include "emp/base/vector.hpp"
 #include "emp/tools/String.hpp"
 
+static inline emp::String LineToRawText(emp::String line) {
+  emp::String out_line;
+
+  // Everything between backslash \& and ; or \< to > ignore.
+  char scan_to = '\0';
+  bool start_scan = false;
+  emp::String scan_word;
+
+  // If we have a negative value, we need to wait for another char to know the symbol
+  char partial = '\0';
+  for (char c : line) {
+    if (partial) {
+      int val1 = static_cast<int>(partial);
+      int val2 = static_cast<int>(c);
+      switch (val1) {
+      case -50:
+        switch (val2) {
+        case -87: out_line += "O"; break;
+        case -104: out_line += "T"; break;
+        default:
+          emp::notify::Error("Unknown char combo: ", val1, ",", val2, "\nline: ", line);          
+        }
+        break;
+      default:
+        emp::notify::Error("Unknown char combo: ", val1, ",", val2, "\nline: ", line);          
+      }
+      partial = '\0';
+      continue;
+    }
+    if (c < 0) {
+      partial = c;
+      continue;
+    }
+
+    if (scan_to) {  // Do we need to literally translate?
+      if (scan_to == c) {
+        if (c == ';') {
+          if (scan_word == "Theta") out_line += "T";
+          else if (scan_word == "Omega") out_line += "O";
+        }
+        scan_to = '\0';
+        scan_word = "";
+      } else {
+        scan_word += c;
+      }
+      continue;
+    }
+
+    if (start_scan) {
+      switch (c) {
+      case '&': scan_to = ';'; break;
+      case '<': scan_to = '>'; break;
+      case '\\': out_line += c; break;
+      case 'n': out_line += "\\\\ "; break;
+      default:
+        std::cerr << "Error: Unknown escape character '" << c << "'.\n" << std::endl;
+        exit(1);
+      }
+      start_scan = false;
+      continue;
+    }
+
+    switch (c) {
+      case '\\': start_scan = true; break;
+      case '`':  break;
+      default:
+        out_line += c;
+        break;
+    }
+  }
+
+  return out_line;
+}
+
 // Convert a single line of text to D2L format.
 static inline emp::String LineToD2L(emp::String line) {
   emp::notify::TestError(line.Has('\n'), "Newline found inside of line: ", line);
@@ -269,6 +343,13 @@ static inline emp::String LineToHTML(emp::String line) {
   if (in_code) out_line += "</code>";
 
   return out_line;
+}
+
+// Convert a whole text block to Raw Text format.
+static inline emp::String TextToRawText(const emp::String & text) {
+  emp::vector<emp::String> lines = text.Slice("\n");
+  for (auto & line : lines) line = LineToRawText(line);
+  return emp::Join(lines, "\n");
 }
 
 // Convert a whole text block to D2L format.
