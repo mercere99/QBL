@@ -33,20 +33,37 @@ void Question_MultipleChoice::PrintD2L(std::ostream& os) const {
 }
 
 void Question_MultipleChoice::PrintGradeScope(std::ostream& os, size_t q_num) const {
+  size_t opt_width = 0;
+  for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
+    opt_width += 10; // Fixed amount per option.
+    opt_width += LineToRawText(options[opt_id].text).size();
+  }
+
   os << "% QUESTION ID " << id << "\n"
      << "\\noindent\\begin{minipage}{\\linewidth}\n"
      << "\\vspace{20pt}\\hangpara{1.8em}{1}\n"
-     << q_num << ". " << TextToLatex(question) << "\n"
-     << "\\begin{itemize}[label={}]\n";
+     << q_num << ". " << TextToLatex(question);
 
-  for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
-    os << "\\item \\chooseone ";
-    if (options[opt_id].is_correct) os << "\\showcorrect ";
-    os << TextToLatex(options[opt_id].text) << '\n';
+  if (opt_width < 100) {  // All on one line.
+    os << "\\\\\n"
+       << "\\vspace{1pt}\\\\\n";
+    for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
+      os << "\\chooseone ";
+      if (options[opt_id].is_correct) os << "\\showcorrect ";
+      os << TextToLatex(options[opt_id].text) << " \\hspace*{3em}\n";
+    }
+  } else {
+    os << "\n"
+      << "\\begin{itemize}[label={}]\n";
+    for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
+      os << "\\item \\chooseone ";
+      if (options[opt_id].is_correct) os << "\\showcorrect ";
+      os << TextToLatex(options[opt_id].text) << '\n';
+    }
+    os << "\\end{itemize}\n";
   }
 
-  os << "\\end{itemize}\n"
-     << "\\end{minipage}\n"
+  os << "\\end{minipage}\n"
      << std::endl;
 }
 
