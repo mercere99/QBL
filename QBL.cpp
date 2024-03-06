@@ -51,7 +51,12 @@ private:
   emp::Random random;                 // Random number generator
 
   // Helper functions
-  void _AddTags(emp::vector<String> & tags, const String & arg) { emp::Append(tags, arg.Slice()); }
+  void _AddTags(emp::vector<String> & tags, const String & arg, size_t count=1) {
+    auto args = arg.Slice();
+    for (size_t i = 0; i < count; ++i) {
+      emp::Append(tags, args);
+    }
+  }
 
 public:
   QBL(int argc, char * argv[]) : flags(argc, argv) {
@@ -91,8 +96,9 @@ public:
       "Include ALL questions with the following tag(s), not otherwise excluded.");
     flags.AddOption('r', "--require", [this](String arg){ _AddTags(require_tags, arg); },
       "Only questions with the following tag(s) can be included.");
-    flags.AddOption('s', "--sample",  [this](String arg){ _AddTags(sample_tags, arg); },
-      "At least one question with the following tag(s) should be included.");
+    flags.AddOption('s', "--sample",
+      [this](String tag_arg, String count_arg){ _AddTags(sample_tags, tag_arg, count_arg.As<size_t>()); },
+      "Specify tag(s) and the number of times they should be included.");
     flags.AddOption('x', "--exclude", [this](String arg){ _AddTags(exclude_tags, arg); },
       "Exclude all questions with following tag(s).");
     flags.AddOption('L', "--log", [this](String arg){ log_filename = arg; },
