@@ -35,12 +35,12 @@ The following flags are also available:
 | `-w` or `--web`      | Output to HTML format.                                    | `-w`            |
 
 ### Tag management
-| Flag                 | Meaning                                                   | Example              |
-| -------------------- | --------------------------------------------------------- | -------------------- |
-| `-i` or `--include`  | All questions with the provided tag(s) must be included.  | `-i prereq,basic`    |
-| `-r` or `--require`  | Exclude questions must that do not have any provided tag. | `-r cse101a,cse101b` |
-| `-s` or `--sample`   | Include at least one question with each provided tag.     | `-s topic1,topic2`   |
-| `-x` or `--exclude`  | Exclude all questions with the provided tag(s).           | `-x sample`          |
+| Flag                 | Meaning                                                   | Example                |
+| -------------------- | --------------------------------------------------------- | ---------------------- |
+| `-i` or `--include`  | All questions with the provided tag(s) must be included.  | `-i prereq,basic`      |
+| `-r` or `--require`  | Exclude questions must that do not have any provided tag. | `-r cse101a,cse101b`   |
+| `-s` or `--sample`   | For each listed tag, include specified no. of questions.  | `-s topic1,topic2 10`  |
+| `-x` or `--exclude`  | Exclude all questions with the provided tag(s).           | `-x badtag`            |
 
 Note: All exclusions occur _before_ any questions are included.  Thus if a question has both
 an include and exclude tag, exclusion takes priority.  Likewise if it is missing a required tag,
