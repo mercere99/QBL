@@ -167,12 +167,10 @@ static inline emp::String LineToLatex(emp::String line) {
     line.PopFixed(4);
     out_line += "\\texttt{";
 
-    size_t ws_count = 0;
+    size_t ws_count = 2;
     while (ws_count < line.size() && line[ws_count] == ' ') ws_count++;
-    if (ws_count) {
-      out_line += emp::MakeString("\\hspace*{", ws_count, "em}");
-      line.PopFixed(ws_count);
-    }
+    out_line += emp::MakeString("\\hspace*{", ws_count, "em}");
+    line.PopFixed(ws_count-2);
   }
 
   for (char c : line) {
@@ -242,7 +240,10 @@ static inline emp::String LineToLatex(emp::String line) {
       case '}': out_line += "\\}";  break;
       case '%': out_line += "\\%";  break;
       case '$': out_line += "\\$";  break;
-      case '~': out_line += "\\~";  break;
+      case '<': out_line += "$<$";  break;
+      case '>': out_line += "$>$";  break;
+      case '~': out_line += "$\\sim$";  break;
+      case '&': out_line += "\\&";  break;
       case '#': out_line += "\\#";  break;
       case '_': out_line += "\\_";  break;
       case '\\': start_scan = true; break;
