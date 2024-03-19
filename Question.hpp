@@ -28,7 +28,7 @@ protected:
   emp::vector<String> exclusive_tags;  ///< Tags for question groups where only one should be used.
   std::map<String,String> config_tags; ///< Tags to specify question details (num options, etc)
 
-  size_t points = 5;          ///< How many points should this question be worth?
+  size_t points = 1;          ///< How many points should this question be worth?
   bool is_required = false;   ///< Must this question be used on a generated quiz?
   bool is_fixed = false;      ///< Is this question locked into this order?
   size_t avoid = 0;           ///< How many times should we skip this question before picking it?
@@ -44,9 +44,9 @@ protected:
   Section last_edit = Section::NONE;
 
   template <typename T>
-  T _GetConfig(String name, T default_val=T{}) {
+  T _GetConfig(String name, T default_val=T{}) const {
     if (!emp::Has(config_tags, name)) return default_val;
-    const String & val = config_tags[name];
+    const String & val = config_tags.find(name)->second;
 
     // Ranges should allow a dash.
     if constexpr (std::is_same_v<T,emp::Range<size_t>>) {
@@ -99,6 +99,8 @@ public:
   const emp::String & GetAltQuestion() const { return alt_question; }
   const emp::String & GetExplanation() const { return explanation; }
   const emp::String & GetHint() const { return hint; }
+
+  size_t GetPoints() const { return _GetConfig(":points", points); }
 
   bool IsFixed() const { return is_fixed; }
   bool IsRequired() const { return is_required; }
