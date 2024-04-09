@@ -18,7 +18,7 @@ void Question_MultipleChoice::PrintD2L(std::ostream& os) const {
     << "ID,QBL-" << id << ",,,\n"
     << "Title,,,,\n"
     << "QuestionText," << TextToD2L(question) << ",HTML,,\n"
-    << "Points," << points << ",,,\n"
+    << "Points," << GetPoints() << ",,,\n"
     << "Difficulty,1,,,\n"
     << "Image,,,,\n";
   for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
