@@ -322,9 +322,9 @@ public:
     }
   }
 
-  void PrintGradeScope(std::ostream & os=std::cout) const {
+  void PrintGradeScope(std::ostream & os=std::cout, bool compressed = false) const {
     for (size_t id = 0; id < questions.size(); ++id) {
-      questions[id]->PrintGradeScope(os, id+1);
+      questions[id]->PrintGradeScope(os, id+1, compressed);
     }
   }
 
