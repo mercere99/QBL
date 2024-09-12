@@ -49,6 +49,7 @@ private:
   emp::vector<String> avoid_files;    // Files with lists of questions IDs to avoid
   size_t generate_count = 0;          // How many questions should be generated? (0 = use all)
   emp::Random random;                 // Random number generator
+  bool compressed_format = false;     // Should GradeScope output be compressed?
 
   // Helper functions
   void _AddTags(emp::vector<String> & tags, const String & arg, size_t count=1) {
@@ -88,6 +89,8 @@ public:
       "Set output to HTML/CSS/JS format.");
     flags.AddOption('O', "--order",   [this](String arg){ SetOrder(arg); },
       "Set the question order based on [arg] (\"random\", \"id\", or \"alpha\")");
+    flags.AddOption('c', "--compressed",   [this](){ compressed_format = true; },
+      "Make questions take less space (only works for GradeScope output).");
 
     flags.AddGroup("Question Specification",
       "These options provide addition constraints as QBL decides which questions\n"
@@ -240,7 +243,7 @@ public:
       case Format::QBL:        qbank.Print(os); break;
       case Format::NONE:       qbank.Print(os); break;
       case Format::D2L:        qbank.PrintD2L(os); break;
-      case Format::GRADESCOPE: qbank.PrintGradeScope(os); break;
+      case Format::GRADESCOPE: qbank.PrintGradeScope(os, compressed_format); break;
       case Format::LATEX:      qbank.PrintLatex(os); break;
       case Format::WEB:        emp::notify::Error("Web output must go to files."); break;
       case Format::DEBUG:      PrintDebug(os); break;
