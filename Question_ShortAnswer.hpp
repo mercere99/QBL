@@ -6,8 +6,8 @@
 class Question_ShortAnswer : public Question {
 private:
   emp::vector<String> answers;
-  bool case_sensitive = false; ///< Should we only allow answers with correct case?
-  bool is_numeric = false;     ///< Should we allow equivalent numerical values?
+  // bool case_sensitive = false; ///< Should we only allow answers with correct case?
+  // bool is_numeric = false;     ///< Should we allow equivalent numerical values?
 
 public:
   Question_ShortAnswer() { }

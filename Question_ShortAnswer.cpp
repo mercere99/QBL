@@ -29,6 +29,9 @@ void Question_ShortAnswer::PrintD2L(std::ostream& os) const {
 
 void Question_ShortAnswer::PrintGradeScope(std::ostream& os, size_t q_num, bool compressed) const {
   os << "NEED TO UPDATE!!!!\n";
+  (void) os;
+  (void) q_num;
+  (void) compressed;
   // os << "% QUESTION ID " << id << "\n"
   //    << "\\vspace{10pt}\n"
   //    << TextToLatex(question) << "\n"
