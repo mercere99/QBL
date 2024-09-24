@@ -244,17 +244,20 @@ public:
   void Generate_DoSamples(emp::Random & random, const tag_set_t & sample_tags) {
     for (const String & tag : sample_tags) {
       emp::vector<size_t> tag_ids; // Question IDs to choose from with this tag.
-      bool sampled = false;
+      int sample_count = 0;
       for (size_t id=0; id < questions.size(); ++id) {
         // Skip questions that don't have the tag or are already excluded.
         if (!questions[id]->HasTag(tag) || q_status[id] == QStatus::EXCLUDED) continue;
 
         // If a question with the tag is already included, we are done!
-        if (q_status[id] == QStatus::INCLUDED) { sampled=true; break; }
+        if (q_status[id] == QStatus::INCLUDED) {
+          sample_count += 1;
+          continue;
+        }
 
         tag_ids.push_back(id); // Track this question as one to possibly add.
       }
-      if (sampled) continue;
+      if (sample_count == std::count(sample_tags.begin(), sample_tags.end(), tag)) continue;
 
       if (tag_ids.size() == 0) {
         emp::notify::Warning("Unable to find sample for tag '", tag, "'.");
@@ -322,9 +325,9 @@ public:
     }
   }
 
-  void PrintGradeScope(std::ostream & os=std::cout) const {
+  void PrintGradeScope(std::ostream & os=std::cout, bool compressed = false) const {
     for (size_t id = 0; id < questions.size(); ++id) {
-      questions[id]->PrintGradeScope(os, id+1);
+      questions[id]->PrintGradeScope(os, id+1, compressed);
     }
   }
 

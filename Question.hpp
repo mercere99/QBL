@@ -178,7 +178,7 @@ public:
 
   virtual void Print(std::ostream & os=std::cout) const = 0;
   virtual void PrintD2L(std::ostream & os=std::cout) const = 0;
-  virtual void PrintGradeScope(std::ostream & os=std::cout, size_t q_num=0) const = 0;
+  virtual void PrintGradeScope(std::ostream & os=std::cout, size_t q_num=0, bool compressed=false) const = 0;
   virtual void PrintHTML(std::ostream & os=std::cout, size_t q_num=0) const = 0;
   virtual void PrintJS(std::ostream & os=std::cout) const = 0;
   virtual void PrintLatex(std::ostream & os=std::cout) const = 0;

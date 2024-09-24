@@ -30,7 +30,7 @@ public:
 
   void Print(std::ostream & os=std::cout) const override;
   void PrintD2L(std::ostream & os=std::cout) const override;
-  void PrintGradeScope(std::ostream & os=std::cout, size_t q_num=0) const override;
+  void PrintGradeScope(std::ostream & os=std::cout, size_t q_num=0, bool compressed = false) const override;
   void PrintHTML(std::ostream & os=std::cout, size_t q_num=0) const override;
   void PrintJS(std::ostream & os=std::cout) const override;
   void PrintLatex(std::ostream & os=std::cout) const override;

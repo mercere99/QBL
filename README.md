@@ -33,6 +33,7 @@ The following flags are also available:
 | `-l` or `--latex`    | (PARTIALLY IMPLEMENTED) Output to Latex format            | `-l`            |
 | `-q` or `--qbl`      | Output to QBL format.                                     | `-q`            |
 | `-w` or `--web`      | Output to HTML format.                                    | `-w`            |
+| `-c` or `--compressed`      |  Only works with Gradescope format; output questions in a compressed format that takes up less space            | `-c`            |
 
 ### Tag management
 | Flag                 | Meaning                                                   | Example                |

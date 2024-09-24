@@ -32,7 +32,7 @@ void Question_MultipleChoice::PrintD2L(std::ostream& os) const {
      << ",,,,\n";
 }
 
-void Question_MultipleChoice::PrintGradeScope(std::ostream& os, size_t q_num) const {
+void Question_MultipleChoice::PrintGradeScope(std::ostream& os, size_t q_num, bool compressed) const {
   size_t opt_width = 0;
   for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
     opt_width += 10; // Fixed amount per option.
@@ -48,6 +48,19 @@ void Question_MultipleChoice::PrintGradeScope(std::ostream& os, size_t q_num) co
     os << "\\\\\n"
        << "\\vspace{1pt}\\\\\n";
     for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
+      os << "\\chooseone ";
+      if (options[opt_id].is_correct) os << "\\showcorrect ";
+      os << TextToLatex(options[opt_id].text) << " \\hspace*{3em}\n";
+    }
+  } else if (compressed) {
+    os << "\\\\\n";
+    int curr_width = 0;
+    for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
+      curr_width += 10 + LineToRawText(options[opt_id].text).size();
+      if (curr_width > 100) {
+        os << "\\\\\n";
+        curr_width = 10 + LineToRawText(options[opt_id].text).size();
+      }
       os << "\\chooseone ";
       if (options[opt_id].is_correct) os << "\\showcorrect ";
       os << TextToLatex(options[opt_id].text) << " \\hspace*{3em}\n";
