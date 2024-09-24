@@ -167,10 +167,10 @@ static inline emp::String LineToLatex(emp::String line) {
     line.PopFixed(4);
     out_line += "\\texttt{";
 
-    size_t ws_count = 2;
-    while (ws_count < line.size() && line[ws_count] == ' ') ws_count++;
-    out_line += emp::MakeString("\\hspace*{", ws_count, "em}");
-    line.PopFixed(ws_count-2);
+    size_t ws_count = 0;
+    while (ws_count < line.size() && line[ws_count] == ' ') ++ws_count;
+    out_line += emp::MakeString("\\hspace*{", ws_count+2, "em}");
+    line.PopFixed(ws_count);
   }
 
   for (char c : line) {
