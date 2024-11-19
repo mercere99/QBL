@@ -3,7 +3,7 @@ Which of the following is NOT a correct way to indicate a newline at the end of 
 * `std::cout << "Hello World!" << std::endl;`
 * `std::cout << "Hello World!\n";`
 * `std::cout << "Hello World!" << "\n";`
-[*] `std::cout << "Hello World!\endl";`
+[*] `std::cout << "Hello World!\\endl";`
 * `std::cout << "Hello World!"; std::cout << "\n";`
 *+> `std::cout << "Hello World!"; std::cout << std::endl;`
 
@@ -38,3 +38,15 @@ Given the following function, which one of the following claims is incorrect? (i
 [*] If x is 10 and I call `CrazyFun(x)` it will return 100
 * if x is 5 and I call `CrazyFun(x)`, x will then be 6
 
+Which of the following numbers are even? Check all that apply
+:correct=2-4 :options=5
+* 1
+[*] 2
+* 3
+[*] 4
+* 5
+[*] 6
+* 7
+[*] 8
+* 9
+[*] 10

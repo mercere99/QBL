@@ -34,6 +34,12 @@ void Question_MultipleChoice::PrintD2L(std::ostream& os) const {
 
 void Question_MultipleChoice::PrintGradeScope(std::ostream& os, size_t q_num, bool compressed) const {
   size_t opt_width = 0;
+  size_t num_correct = correct_range.GetSize();
+  std::string bubble_type = "\\chooseone ";
+  if (num_correct > 1) {
+    bubble_type = "\\choosemany ";
+  }
+  
   for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
     opt_width += 10; // Fixed amount per option.
     opt_width += LineToRawText(options[opt_id].text).size();
@@ -48,7 +54,7 @@ void Question_MultipleChoice::PrintGradeScope(std::ostream& os, size_t q_num, bo
     os << "\\\\\n"
        << "\\vspace{1pt}\\\\\n";
     for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
-      os << "\\chooseone ";
+      os << bubble_type;
       if (options[opt_id].is_correct) os << "\\showcorrect ";
       os << TextToLatex(options[opt_id].text) << " \\hspace*{3em}\n";
     }
@@ -61,15 +67,15 @@ void Question_MultipleChoice::PrintGradeScope(std::ostream& os, size_t q_num, bo
         os << "\\\\\n";
         curr_width = 10 + LineToRawText(options[opt_id].text).size();
       }
-      os << "\\chooseone ";
+      os << bubble_type;
       if (options[opt_id].is_correct) os << "\\showcorrect ";
-      os << TextToLatex(options[opt_id].text) << " \\hspace*{3em}\n";
+      os << TextToLatex(options[opt_id].text) << " \\hspace*{.5em}\n";
     }
   } else {
     os << "\n"
       << "\\begin{itemize}[label={}]\n";
     for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
-      os << "\\item \\chooseone ";
+      os << "\\item " << bubble_type;
       if (options[opt_id].is_correct) os << "\\showcorrect ";
       os << TextToLatex(options[opt_id].text) << '\n';
     }
