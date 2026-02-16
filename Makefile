@@ -7,7 +7,7 @@ TARGET := QBL
 CPP_FILES := QBL.cpp Question_MultipleChoice.cpp Question_ShortAnswer.cpp
 
 # Specify sets of compilation flags to use
-FLAGS_version := -std=c++20
+FLAGS_version := -std=c++23
 FLAGS_warn    = -Wall -Wextra -Wno-unused-function -Woverloaded-virtual -pedantic
 FLAGS_include = -I$(EMP_DIR)/include/ -I${EMP_DIR}/third-party/cereal/include/
 FLAGS_main    = $(FLAGS_version) $(FLAGS_warn) $(FLAGS_include) -pthread
