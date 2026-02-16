@@ -28,22 +28,20 @@ void Question_ShortAnswer::PrintD2L(std::ostream& os) const {
 }
 
 void Question_ShortAnswer::PrintGradeScope(std::ostream& os, size_t q_num, bool compressed) const {
-  os << "NEED TO UPDATE!!!!\n";
-  (void) os;
-  (void) q_num;
-  (void) compressed;
-  // os << "% QUESTION ID " << id << "\n"
-  //    << "\\vspace{10pt}\n"
-  //    << TextToLatex(question) << "\n"
-  //    << "\\begin{itemize}[label={}]\n";
 
-  // for (size_t opt_id = 0; opt_id < options.size(); ++opt_id) {
-  //   os << "\\item \\chooseone ";
-  //   if (options[opt_id].is_correct) os << "\\showcorrect ";
-  //   os << TextToLatex(options[opt_id].text) << '\n';
-  // }
+  os << "% QUESTION ID " << id << "\n"
+     << "\\noindent\\begin{minipage}{\\linewidth}\n"
+     << "\\vspace{20pt}\\hangpara{1.8em}{1}\n"
+     << q_num << ". " << TextToLatex(question) << "\n";
 
-  // os << "\\end{itemize}\n" << std::endl;
+  os << "\\framebox(100,30){}\n"; // Blank answer box.
+
+  for (const String & option : answers) {
+    os << "% Answer:" << option << '\n';
+  }
+
+  os << "\\end{minipage}\n"
+     << std::endl;
 }
 
 void Question_ShortAnswer::PrintHTML(std::ostream & os, size_t q_num) const {
